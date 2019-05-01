@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing_Reloaded_Server", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing_Reloaded_Client", "Testing_Reloaded_Client\Testing_Reloaded_Client.csproj", "{862B0AA2-E0FA-4EF9-9800-9C05A710E08A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedLibrary", "SharedLibrary\SharedLibrary.csproj", "{C139E9E9-3D07-4F73-AFD4-9ED950EFCE97}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{862B0AA2-E0FA-4EF9-9800-9C05A710E08A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{862B0AA2-E0FA-4EF9-9800-9C05A710E08A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{862B0AA2-E0FA-4EF9-9800-9C05A710E08A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C139E9E9-3D07-4F73-AFD4-9ED950EFCE97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C139E9E9-3D07-4F73-AFD4-9ED950EFCE97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C139E9E9-3D07-4F73-AFD4-9ED950EFCE97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C139E9E9-3D07-4F73-AFD4-9ED950EFCE97}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

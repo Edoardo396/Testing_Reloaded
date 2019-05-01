@@ -16,5 +16,10 @@ namespace Testing_Reloaded_Client
         {
             InitializeComponent();
         }
+
+        private void BtnWaitForClients_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

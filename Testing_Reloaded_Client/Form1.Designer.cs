@@ -181,6 +181,7 @@
             this.btnWaitForClients.TabIndex = 7;
             this.btnWaitForClients.Text = "Attendi Clients";
             this.btnWaitForClients.UseVisualStyleBackColor = true;
+            this.btnWaitForClients.Click += new System.EventHandler(this.BtnWaitForClients_Click);
             // 
             // btnStartTest
             // 
