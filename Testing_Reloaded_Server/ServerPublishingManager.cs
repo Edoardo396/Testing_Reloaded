@@ -45,7 +45,7 @@ namespace Testing_Reloaded_Server {
         private string GetResponse(JObject json) {
             if (json["Action"].Value<string>() == "discover") {
                 return JsonConvert.SerializeObject(new
-                    {Action = "Report", Hostname = Environment.MachineName, CurrentTest = this.currentTest});
+                    {Action = "Report", Hostname = Environment.MachineName});
             }
 
             return JsonConvert.SerializeObject(new {Action = "Error", Error = "invalid request"});

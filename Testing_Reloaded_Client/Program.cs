@@ -16,7 +16,7 @@ namespace Testing_Reloaded_Client
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmTestStart());
+            Application.Run(new frmJoinTest());
         }
     }
 }
