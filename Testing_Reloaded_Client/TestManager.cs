@@ -9,71 +9,58 @@ using SharedLibrary;
 
 namespace Testing_Reloaded_Client {
     public class TestManager {
-        private Server server;
-
-        private TcpClient tcpClient;
-        private NetworkStream dataStream;
-        private StreamWriter netWriter;
-        private StreamReader netReader;
+      
+        private User me;
+        private NetworkManager netManager;
+        
 
         private Test currentTest;
 
-        public TestManager(Server server) {
-            this.server = server;
-            tcpClient = new TcpClient(AddressFamily.InterNetwork);
+        public TestManager(Server server, User me) {
+            
+            this.me = me;
+            this.netManager = new NetworkManager(server);
+           
         }
 
         public static string ResolvePath(string path) {
-            return Environment.ExpandEnvironmentVariables(path).Replace("$cognome", Me.Surname);
+            return Environment.ExpandEnvironmentVariables(path).Replace("$cognome", me.Surname);
         }
 
-        public async Task ConnectToServer() {
-            await tcpClient.ConnectAsync(server.IP, SharedLibrary.Constants.SERVER_PORT);
-            dataStream = tcpClient.GetStream();
-            netWriter = new StreamWriter(dataStream);
-            netReader = new StreamReader(dataStream);
+        public async Task Connect() {
+            await netManager.ConnectToServer();
         }
-
+     
         public async Task DownloadTestData() {
-            if (dataStream == null) return; // TODO
 
             var packet = new {Action = "GetTestInfo", PacketID = Statics.GenerateRandomPacketId()};
 
             var str = (JsonConvert.SerializeObject(packet));
 
-            await netWriter.WriteLineAsync(str);
+            await netManager.WriteLine(str);
 
-            var response = await netReader.ReadLineAsync();
+            var response = await netManager.ReadLine();
             var jsonResponse = JObject.Parse(response);
 
             this.currentTest = JsonConvert.DeserializeObject<Test>(jsonResponse["Test"].ToString());
         }
 
         public async Task DownloadTestDocumentation() {
-            if (dataStream == null || currentTest == null) return; // TODO
-
+            
             string path = ResolvePath(currentTest.DataDownloadPath);
             Directory.Delete(path, true);
             Directory.CreateDirectory(path);
 
             var packet = new { Action = "GetTestDocs", PacketID = Statics.GenerateRandomPacketId() };
 
-            await netWriter.WriteLineAsync(JsonConvert.SerializeObject(packet));
-            var response = await netReader.ReadLineAsync();
 
-            var jsonResponse = JObject.Parse(response);
+            await netManager.WriteLine(JsonConvert.SerializeObject(packet));
 
-            if (jsonResponse["FileType"].ToString() == "archive") {
+            var fastZip = new FastZip();
 
-                int fileSize = (int)jsonResponse.GetValue("FileSize");  // 2GB Limit
-                var bytes = new byte[fileSize];
+            MemoryStream file = await netManager.ReadFile();
 
-                await dataStream.ReadAsync(bytes, 0, bytes.Length);           
-
-                var fastZip = new FastZip();
-
-                fastZip.ExtractZip(new MemoryStream(bytes), path, FastZip.Overwrite.Always, null, null, null, true, true);
-            }
+            fastZip.ExtractZip(file, ResolvePath(currentTest.DataDownloadPath), FastZip.Overwrite.Always, null, "", null, false, true);
         }
     }
 }

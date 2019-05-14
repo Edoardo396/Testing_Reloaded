@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SharedLibrary;
 
 namespace Testing_Reloaded_Client {
     public partial class frmTest : Form {
@@ -14,10 +15,10 @@ namespace Testing_Reloaded_Client {
         private TestManager testManager;
 
 
-        public frmTest(Server selectedServer) {
+        public frmTest(Server selectedServer, User me) {
             InitializeComponent();
 
-            testManager = new TestManager(selectedServer);
+            testManager = new TestManager(selectedServer, me);
         }
 
 
