@@ -29,7 +29,7 @@ namespace Testing_Reloaded_Client {
             lblCurrentOperation.Text = "Connessione";
             await testManager.Connect();
 
-            lblCurrentOperation.Text = "Download Test";
+            lblCurrentOperation.Text = "Download Dati Test";
 
             await testManager.DownloadTestData();
             lblTestName.Text = testManager.CurrentTest.TestName;
@@ -37,6 +37,15 @@ namespace Testing_Reloaded_Client {
             lblRemainingTime.Text = testManager.CurrentTest.Time.ToString();
 
             lblTestDir.Text = "Attendo inizio del test";
+            lblCurrentOperation.Text = "Attendo Inizio";
+
+            await testManager.WaitForTestStart();
+
+            lblTestDir.Text = testManager.ResolvePath(testManager.CurrentTest.DataDownloadPath);
+            lblCurrentOperation.Text = "Download documentazione";
+            await testManager.DownloadTestDocumentation();
+
+
         }
     }
 }

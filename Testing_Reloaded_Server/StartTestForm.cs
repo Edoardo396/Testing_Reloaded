@@ -25,16 +25,25 @@ namespace Testing_Reloaded_Server {
         }
 
         private void BtnWaitForClients_Click(object sender, EventArgs e) {
-            var test = new Test {
+            var test = new ServerTest() {
                 DataDownloadPath = txtDataDownloadPath.Text,
                 DeleteFilesAfterEnd = chbDelete.Checked,
                 ReclaimTestImmediately = chbRitira.Checked,
                 TestName = txtTestName.Text,
-                Time = TimeSpan.Parse(chbTime.Text)
+                Time = TimeSpan.Parse(chbTime.Text),
+                State = Test.TestState.NotStarted,
+                DocumentationDirectory = txtDocsDir.Text
             };
 
             publishManager = new ServerPublishingManager(test) {AllowClientsOnHold = true};
             testManager = new TestManager(test);
+
+            lsbConnectedClients.DataSource = testManager.ConnectedClients;
+        }
+
+        private async void BtnStartTest_Click(object sender, EventArgs e) {
+            await testManager.StartTest();
+
         }
     }
 }

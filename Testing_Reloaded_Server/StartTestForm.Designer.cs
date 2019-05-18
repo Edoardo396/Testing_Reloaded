@@ -174,6 +174,7 @@
             this.txtDocsDir.Name = "txtDocsDir";
             this.txtDocsDir.Size = new System.Drawing.Size(223, 20);
             this.txtDocsDir.TabIndex = 6;
+            this.txtDocsDir.Text = "C:\\Users\\Edo\\Desktop\\Temporanea\\QuestionarioOnLine";
             // 
             // btnWaitForClients
             // 
@@ -193,6 +194,7 @@
             this.btnStartTest.TabIndex = 8;
             this.btnStartTest.Text = "Avvia Prova";
             this.btnStartTest.UseVisualStyleBackColor = true;
+            this.btnStartTest.Click += new System.EventHandler(this.BtnStartTest_Click);
             // 
             // lsbConnectedClients
             // 

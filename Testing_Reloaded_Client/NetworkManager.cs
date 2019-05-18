@@ -46,7 +46,8 @@ namespace Testing_Reloaded_Client {
 
         public async Task<byte[]> ReadData() {
             // get data info
-            var dataInfo = JObject.Parse(await ReadLine());
+            var strData = await this.ReadLine();
+            var dataInfo = JObject.Parse(strData);
             int size = (int) dataInfo["Size"];
 
             if (size == 0) return null;

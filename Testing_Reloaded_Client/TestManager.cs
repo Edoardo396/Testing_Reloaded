@@ -9,33 +9,29 @@ using SharedLibrary;
 
 namespace Testing_Reloaded_Client {
     public class TestManager {
-      
         private User me;
         private NetworkManager netManager;
-        
 
         private Test currentTest;
 
         public Test CurrentTest => currentTest;
 
         public TestManager(Server server, User me) {
-            
             this.me = me;
             this.netManager = new NetworkManager(server);
-           
         }
 
         public string ResolvePath(string path) {
-            return Environment.ExpandEnvironmentVariables(path).Replace("$cognome", me.Surname);
+            return Environment.ExpandEnvironmentVariables(path).Replace("$surname", me.Surname)
+                .Replace("$test_name", currentTest.TestName);
         }
 
         public async Task Connect() {
             await netManager.ConnectToServer();
             await netManager.WriteLine(JsonConvert.SerializeObject(new {Action = "Connect", User = me}));
         }
-     
-        public async Task DownloadTestData() {
 
+        public async Task DownloadTestData() {
             var packet = new {Action = "GetTestInfo", PacketID = Statics.GenerateRandomPacketId()};
 
             var str = (JsonConvert.SerializeObject(packet));
@@ -49,12 +45,12 @@ namespace Testing_Reloaded_Client {
         }
 
         public async Task DownloadTestDocumentation() {
-            
             string path = ResolvePath(currentTest.DataDownloadPath);
-            Directory.Delete(path, true);
+            if (Directory.Exists(path))
+                Directory.Delete(path, true);
             Directory.CreateDirectory(path);
 
-            var packet = new { Action = "GetTestDocs", PacketID = Statics.GenerateRandomPacketId() };
+            var packet = new {Action = "GetTestDocs", PacketID = Statics.GenerateRandomPacketId()};
 
 
             await netManager.WriteLine(JsonConvert.SerializeObject(packet));
@@ -63,11 +59,26 @@ namespace Testing_Reloaded_Client {
 
             var fileBytes = await netManager.ReadData();
 
-            if(fileBytes == null) return;
+            if (fileBytes == null) return;
 
             var file = new MemoryStream(fileBytes);
 
-            fastZip.ExtractZip(file, ResolvePath(currentTest.DataDownloadPath), FastZip.Overwrite.Always, null, "", null, false, true);
+            fastZip.ExtractZip(file, ResolvePath(currentTest.DataDownloadPath), FastZip.Overwrite.Always, null, "",
+                null, false, true);
+        }
+
+        public async Task WaitForTestStart() {
+            if (currentTest.State == Test.TestState.Started) return;
+
+            while (true) {
+                string response = await netManager.ReadLine();
+
+                var jsonO = JObject.Parse(response);
+                if (jsonO["Action"].ToString() != "TestStarted") continue;
+
+                currentTest.State = Test.TestState.Started;
+                break;
+            }
         }
     }
 }

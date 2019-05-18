@@ -9,5 +9,9 @@
             Surname = surname;
             PCHostname = pcHostname;
         }
+
+        public override string ToString() {
+            return $"{Name} {Surname}";
+        }
     }
 }

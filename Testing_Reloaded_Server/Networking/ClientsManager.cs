@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharedLibrary;
 
 namespace Testing_Reloaded_Server.Networking {
     public class ClientsManager {
-        private List<Client> clients { get; set; }
+        private BindingList<Client> clients { get; set; }
 
-        public IReadOnlyList<Client> Clients => new ReadOnlyCollection<Client>(clients);
+        public BindingList<Client> Clients => clients;
 
         private TcpListener tcpListener;
         private bool running = true;
@@ -26,7 +28,7 @@ namespace Testing_Reloaded_Server.Networking {
         public event ReceivedMessageFromClientDelegate ReceivedMessageFromClient;
 
         public ClientsManager() {
-            clients = new List<Client>();
+            clients = new ThreadedBindingList<Client>();
         }
 
         public void Start() {
@@ -48,14 +50,23 @@ namespace Testing_Reloaded_Server.Networking {
         private void HandleClient(object o) {
             TcpClient client = (TcpClient) o;
 
-            var sWriter = new StreamWriter(client.GetStream(), SharedLibrary.Constants.USED_ENCODING);
-            var sReader = new StreamReader(client.GetStream(), SharedLibrary.Constants.USED_ENCODING);
+            var stream = client.GetStream();
+
+            var sWriter = new StreamWriter(stream, SharedLibrary.Constants.USED_ENCODING);
+            var sReader = new StreamReader(stream, SharedLibrary.Constants.USED_ENCODING);
 
             Client connectedClient = null;
 
-            while (client.Connected) {
-                System.Diagnostics.Debug.WriteLine(client.GetStream().DataAvailable);
-                var json = sReader.ReadLine();
+            while (client.Connected) {               
+                string json = "";
+
+                if (stream.DataAvailable) {
+                    json = sReader.ReadLine();
+                } else {
+                   // Thread.Sleep(50);
+                    continue;
+                }
+
 
                 JObject data = JObject.Parse(json);
 
@@ -75,6 +86,29 @@ namespace Testing_Reloaded_Server.Networking {
                     sWriter.WriteLine(response);
                     sWriter.Flush();
                 }
+            }
+        }
+
+        public void SendBytes(Client client, byte[] bytes) {
+
+            var stream = client.TcpClient.GetStream();
+            var wStream = new StreamWriter(stream);
+
+            wStream.WriteLine(JsonConvert.SerializeObject(new {Status = "OK", FileType = "zip", Size = bytes.Length}));
+            wStream.Flush();
+
+            foreach (byte b in bytes) {
+                stream.WriteByte(b);
+            }
+
+            stream.Flush();
+        }
+
+        public async Task SendMessageToClients(string message) {
+            foreach (Client client in Clients) {
+                var stream = new StreamWriter(client.TcpClient.GetStream());
+                await stream.WriteLineAsync(message);
+                await stream.FlushAsync();
             }
         }
     }
