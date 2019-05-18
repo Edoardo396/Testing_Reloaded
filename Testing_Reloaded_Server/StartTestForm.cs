@@ -7,14 +7,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SharedLibrary;
+using Testing_Reloaded_Server.Networking;
 
 namespace Testing_Reloaded_Server {
     public partial class StartTestForm : Form {
 
         private ServerPublishingManager publishManager;
+        private ClientsManager clientsManager;
 
         public StartTestForm() {
             InitializeComponent();
+        }
+
+        protected override void OnLoad(EventArgs e) {
+            base.OnLoad(e);
+            clientsManager = new ClientsManager();
         }
 
         private void BtnWaitForClients_Click(object sender, EventArgs e) {
@@ -27,6 +35,7 @@ namespace Testing_Reloaded_Server {
             };
 
             publishManager = new ServerPublishingManager(test) {AllowClientsOnHold = true};
+            clientsManager.Start();
         }
     }
 }

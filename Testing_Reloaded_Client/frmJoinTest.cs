@@ -42,8 +42,9 @@ namespace Testing_Reloaded_Client {
             if (cmbServers.SelectedIndex == -1 || txtName.Text == "" || txtSurname.Text == "")
                 return;
 
-            var mainForm = new frmTest(cmbServers.SelectedItem as Server, new SharedLibrary.User() { Name = txtName.Text, Surname= txtSurname.Text });
+            var mainForm = new frmTest(cmbServers.SelectedItem as Server, new SharedLibrary.User(txtName.Text, txtSurname.Text, Environment.MachineName));
             mainForm.Show();
+            mainForm.FormClosed += (o, args) => this.Close();
             this.Hide();
 
         }

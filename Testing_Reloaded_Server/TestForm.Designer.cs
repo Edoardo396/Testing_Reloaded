@@ -60,7 +60,7 @@
             this.groupBox1.Size = new System.Drawing.Size(687, 382);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Clients";
+            this.groupBox1.Text = "clients";
             // 
             // listView1
             // 

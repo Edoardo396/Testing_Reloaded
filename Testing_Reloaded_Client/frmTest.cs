@@ -11,7 +11,6 @@ using SharedLibrary;
 
 namespace Testing_Reloaded_Client {
     public partial class frmTest : Form {
-
         private TestManager testManager;
 
 
@@ -22,10 +21,10 @@ namespace Testing_Reloaded_Client {
         }
 
 
-
-        protected override void OnLoad(EventArgs e) {
+        protected override async void OnLoad(EventArgs e) {
             base.OnLoad(e);
 
+            await testManager.Connect();
 
         }
     }

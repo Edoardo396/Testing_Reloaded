@@ -57,6 +57,7 @@
             this.txtTestName.Name = "txtTestName";
             this.txtTestName.Size = new System.Drawing.Size(252, 20);
             this.txtTestName.TabIndex = 0;
+            this.txtTestName.Text = "ASP";
             // 
             // label1
             // 
@@ -82,6 +83,7 @@
             this.chbTime.Name = "chbTime";
             this.chbTime.Size = new System.Drawing.Size(252, 20);
             this.chbTime.TabIndex = 2;
+            this.chbTime.Text = "01:00:00";
             // 
             // groupBox1
             // 
@@ -179,7 +181,7 @@
             this.btnWaitForClients.Name = "btnWaitForClients";
             this.btnWaitForClients.Size = new System.Drawing.Size(113, 55);
             this.btnWaitForClients.TabIndex = 7;
-            this.btnWaitForClients.Text = "Attendi Clients";
+            this.btnWaitForClients.Text = "Attendi clients";
             this.btnWaitForClients.UseVisualStyleBackColor = true;
             this.btnWaitForClients.Click += new System.EventHandler(this.BtnWaitForClients_Click);
             // 
@@ -210,7 +212,7 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Client Connessi";
             // 
-            // frmTestStart
+            // StartTestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
