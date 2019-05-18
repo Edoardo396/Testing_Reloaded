@@ -13,6 +13,7 @@ namespace Testing_Reloaded_Client {
         private NetworkManager netManager;
 
         private Test currentTest;
+        public UserTestState TestState;
 
         public Test CurrentTest => currentTest;
 
@@ -29,6 +30,7 @@ namespace Testing_Reloaded_Client {
         public async Task Connect() {
             await netManager.ConnectToServer();
             await netManager.WriteLine(JsonConvert.SerializeObject(new {Action = "Connect", User = me}));
+            await netManager.ReadLine();
         }
 
         public async Task DownloadTestData() {
@@ -42,6 +44,21 @@ namespace Testing_Reloaded_Client {
             var jsonResponse = JObject.Parse(response);
 
             this.currentTest = JsonConvert.DeserializeObject<Test>(jsonResponse["Test"].ToString());
+            TestState = new UserTestState { RemainingTime = currentTest.Time };
+        }
+
+        public async Task WaitForTestStart() {
+            if (currentTest.State == Test.TestState.Started) return;
+
+            while (true) {
+                string response = await netManager.ReadLine();
+
+                var jsonO = JObject.Parse(response);
+                if (jsonO["Action"].ToString() != "TestStarted") continue;
+
+                currentTest.State = Test.TestState.Started;
+                break;
+            }
         }
 
         public async Task DownloadTestDocumentation() {
@@ -69,18 +86,11 @@ namespace Testing_Reloaded_Client {
                 null, false, true);
         }
 
-        public async Task WaitForTestStart() {
-            if (currentTest.State == Test.TestState.Started) return;
 
-            while (true) {
-                string response = await netManager.ReadLine();
-
-                var jsonO = JObject.Parse(response);
-                if (jsonO["Action"].ToString() != "TestStarted") continue;
-
-                currentTest.State = Test.TestState.Started;
-                break;
-            }
+        // must be called every 1 second
+        public void TimeElapsed() {
+            if (currentTest.State == Test.TestState.Started)
+                TestState.RemainingTime -= TimeSpan.FromSeconds(1);
         }
     }
 }

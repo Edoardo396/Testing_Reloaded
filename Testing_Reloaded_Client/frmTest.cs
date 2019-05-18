@@ -52,6 +52,15 @@ namespace Testing_Reloaded_Client {
                 $"Il test è iniziato.\r\nLa cartella del test è {testManager.ResolvePath(testManager.CurrentTest.ClientTestPath)} puoi trovare la documentazione del test nella sottocartella Documentation se è disponibile. Quando consegnerai veraano inviati tutti i file che si trovano nella cartella del test. in bocca al lupo!";
 
             MessageBox.Show(message, "Test iniziato", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+
+            testTimer.Start();
+        }
+
+        private void TestTimer_Tick(object sender, EventArgs e) {
+            testManager.TimeElapsed();
+            lblRemainingTime.Text = testManager.TestState.RemainingTime.ToString();
+
         }
     }
 }

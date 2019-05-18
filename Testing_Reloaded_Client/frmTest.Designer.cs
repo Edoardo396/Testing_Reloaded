@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.grbTestInfo = new System.Windows.Forms.GroupBox();
             this.lblTestDuration = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
@@ -40,6 +41,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.lblCurrentOperation = new System.Windows.Forms.Label();
+            this.testTimer = new System.Windows.Forms.Timer(this.components);
             this.grbTestInfo.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -66,9 +68,9 @@
             this.lblTestDuration.AutoSize = true;
             this.lblTestDuration.Location = new System.Drawing.Point(77, 58);
             this.lblTestDuration.Name = "lblTestDuration";
-            this.lblTestDuration.Size = new System.Drawing.Size(53, 13);
+            this.lblTestDuration.Size = new System.Drawing.Size(55, 13);
             this.lblTestDuration.TabIndex = 8;
-            this.lblTestDuration.Text = "ASP.NET";
+            this.lblTestDuration.Text = "100:00:00";
             // 
             // label6
             // 
@@ -84,9 +86,9 @@
             this.lblTestName.AutoSize = true;
             this.lblTestName.Location = new System.Drawing.Point(77, 33);
             this.lblTestName.Name = "lblTestName";
-            this.lblTestName.Size = new System.Drawing.Size(53, 13);
+            this.lblTestName.Size = new System.Drawing.Size(65, 13);
             this.lblTestName.TabIndex = 6;
-            this.lblTestName.Text = "ASP.NET";
+            this.lblTestName.Text = "Test Di Test";
             // 
             // label4
             // 
@@ -102,9 +104,9 @@
             this.lblTestDir.AutoSize = true;
             this.lblTestDir.Location = new System.Drawing.Point(9, 232);
             this.lblTestDir.Name = "lblTestDir";
-            this.lblTestDir.Size = new System.Drawing.Size(152, 13);
+            this.lblTestDir.Size = new System.Drawing.Size(178, 13);
             this.lblTestDir.TabIndex = 4;
-            this.lblTestDir.Text = "C:\\Users\\user\\Desktop\\Name";
+            this.lblTestDir.Text = "C:\\Users\\user\\Desktop\\Name\\Test";
             // 
             // label2
             // 
@@ -146,20 +148,24 @@
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(12, 16);
+            this.progressBar1.Location = new System.Drawing.Point(12, 12);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(161, 34);
+            this.progressBar1.Size = new System.Drawing.Size(161, 43);
             this.progressBar1.TabIndex = 1;
             // 
             // lblCurrentOperation
             // 
-            this.lblCurrentOperation.AutoSize = true;
             this.lblCurrentOperation.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCurrentOperation.Location = new System.Drawing.Point(179, 16);
+            this.lblCurrentOperation.Location = new System.Drawing.Point(179, 9);
             this.lblCurrentOperation.Name = "lblCurrentOperation";
-            this.lblCurrentOperation.Size = new System.Drawing.Size(143, 18);
+            this.lblCurrentOperation.Size = new System.Drawing.Size(143, 46);
             this.lblCurrentOperation.TabIndex = 9;
-            this.lblCurrentOperation.Text = "Current Operation";
+            this.lblCurrentOperation.Text = "This is just a simple test";
+            // 
+            // testTimer
+            // 
+            this.testTimer.Interval = 1000;
+            this.testTimer.Tick += new System.EventHandler(this.TestTimer_Tick);
             // 
             // frmTest
             // 
@@ -174,7 +180,6 @@
             this.grbTestInfo.ResumeLayout(false);
             this.grbTestInfo.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -192,5 +197,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Label lblCurrentOperation;
+        private System.Windows.Forms.Timer testTimer;
     }
 }

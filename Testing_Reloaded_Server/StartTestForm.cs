@@ -38,6 +38,7 @@ namespace Testing_Reloaded_Server {
             groupBox1.Enabled = false;
             groupBox2.Enabled = false;
             groupBox3.Enabled = false;
+            btnWaitForClients.Enabled = false;
 
             publishManager = new ServerPublishingManager(test) {AllowClientsOnHold = true};
             testManager = new TestManager(test);

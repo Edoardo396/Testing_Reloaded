@@ -72,7 +72,11 @@ namespace Testing_Reloaded_Server.Networking {
 
                 if (data["Action"].ToString() == "Connect") {
                     connectedClient = new Client(JsonConvert.DeserializeObject<User>(data["User"].ToString()), client);
+
                     clients.Add(connectedClient);
+                    sWriter.WriteLine(JsonConvert.SerializeObject(new { Status = "OK" }));
+                    sWriter.Flush();
+                    continue;
                 }
 
                 if (connectedClient == null) {
