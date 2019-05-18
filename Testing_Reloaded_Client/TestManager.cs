@@ -16,6 +16,8 @@ namespace Testing_Reloaded_Client {
 
         private Test currentTest;
 
+        public Test CurrentTest => currentTest;
+
         public TestManager(Server server, User me) {
             
             this.me = me;

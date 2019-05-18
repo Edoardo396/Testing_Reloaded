@@ -43,6 +43,8 @@ namespace Testing_Reloaded_Client {
                 }
 
             }), Task.Delay(1000));
+
+            client.Close();
         }
     }
 }

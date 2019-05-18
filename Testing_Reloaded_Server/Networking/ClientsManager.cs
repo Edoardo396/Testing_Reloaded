@@ -16,18 +16,22 @@ namespace Testing_Reloaded_Server.Networking {
 
         public IReadOnlyList<Client> Clients => new ReadOnlyCollection<Client>(clients);
 
-        private readonly TcpListener tcpListener;
+        private TcpListener tcpListener;
         private bool running = true;
 
-        private readonly Thread clientsThread;
+        private Thread clientsThread;
+
+        public delegate string ReceivedMessageFromClientDelegate(Client c, JObject message);
+
+        public event ReceivedMessageFromClientDelegate ReceivedMessageFromClient;
 
         public ClientsManager() {
-            tcpListener = new TcpListener(new IPEndPoint(IPAddress.Any, SharedLibrary.Constants.SERVER_PORT));
-            clientsThread = new Thread(LoopClients);
             clients = new List<Client>();
         }
 
         public void Start() {
+            tcpListener = new TcpListener(new IPEndPoint(IPAddress.Any, SharedLibrary.Constants.SERVER_PORT));
+            clientsThread = new Thread(LoopClients);
             clientsThread.Start();
         }
 
@@ -47,7 +51,7 @@ namespace Testing_Reloaded_Server.Networking {
             var sWriter = new StreamWriter(client.GetStream(), SharedLibrary.Constants.USED_ENCODING);
             var sReader = new StreamReader(client.GetStream(), SharedLibrary.Constants.USED_ENCODING);
 
-
+            Client connectedClient = null;
 
             while (client.Connected) {
                 System.Diagnostics.Debug.WriteLine(client.GetStream().DataAvailable);
@@ -56,11 +60,22 @@ namespace Testing_Reloaded_Server.Networking {
                 JObject data = JObject.Parse(json);
 
                 if (data["Action"].ToString() == "Connect") {
-                    var user = JsonConvert.DeserializeObject<User>(data["User"].ToString());
-                    clients.Add(new Client(user, client));
+                    connectedClient = new Client(JsonConvert.DeserializeObject<User>(data["User"].ToString()), client);
+                    clients.Add(connectedClient);
+                }
+
+                if (connectedClient == null) {
+                    sWriter.WriteLine(JsonConvert.SerializeObject(new {Status = "ERROR", Code = "SYNFIRST", Message = "Client must call Connect first"}));
+                    sWriter.Flush();
+                }
+
+                string response = this.ReceivedMessageFromClient?.Invoke(connectedClient, data);
+
+                if (response != null) {
+                    sWriter.WriteLine(response);
+                    sWriter.Flush();
                 }
             }
-
         }
     }
 }

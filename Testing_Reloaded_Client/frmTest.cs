@@ -23,9 +23,20 @@ namespace Testing_Reloaded_Client {
 
         protected override async void OnLoad(EventArgs e) {
             base.OnLoad(e);
+            progressBar1.Enabled = true;
+            progressBar1.Style = ProgressBarStyle.Marquee;
 
+            lblCurrentOperation.Text = "Connessione";
             await testManager.Connect();
 
+            lblCurrentOperation.Text = "Download Test";
+
+            await testManager.DownloadTestData();
+            lblTestName.Text = testManager.CurrentTest.TestName;
+            lblTestDuration.Text = testManager.CurrentTest.Time.ToString();
+            lblRemainingTime.Text = testManager.CurrentTest.Time.ToString();
+
+            lblTestDir.Text = "Attendo inizio del test";
         }
     }
 }
