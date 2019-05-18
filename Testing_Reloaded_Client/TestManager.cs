@@ -23,12 +23,13 @@ namespace Testing_Reloaded_Client {
            
         }
 
-        public static string ResolvePath(string path) {
+        public string ResolvePath(string path) {
             return Environment.ExpandEnvironmentVariables(path).Replace("$cognome", me.Surname);
         }
 
         public async Task Connect() {
             await netManager.ConnectToServer();
+            await netManager.WriteLine(JsonConvert.SerializeObject(new {Action = "Connect", User = me}));
         }
      
         public async Task DownloadTestData() {
@@ -58,7 +59,11 @@ namespace Testing_Reloaded_Client {
 
             var fastZip = new FastZip();
 
-            MemoryStream file = await netManager.ReadFile();
+            var fileBytes = await netManager.ReadData();
+
+            if(fileBytes == null) return;
+
+            var file = new MemoryStream(fileBytes);
 
             fastZip.ExtractZip(file, ResolvePath(currentTest.DataDownloadPath), FastZip.Overwrite.Always, null, "", null, false, true);
         }
