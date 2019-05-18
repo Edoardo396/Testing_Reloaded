@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Testing_Reloaded_Server {
-    public partial class FrmTestStart : Form {
+    public partial class StartTestForm : Form {
 
         private ServerPublishingManager publishManager;
 
-        public FrmTestStart() {
+        public StartTestForm() {
             InitializeComponent();
         }
 
@@ -27,7 +27,6 @@ namespace Testing_Reloaded_Server {
             };
 
             publishManager = new ServerPublishingManager(test) {AllowClientsOnHold = true};
-
         }
     }
 }

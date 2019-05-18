@@ -1,6 +1,6 @@
 ﻿namespace Testing_Reloaded_Server
 {
-    partial class FrmTestStart
+    partial class StartTestForm
     {
         /// <summary>
         /// Required designer variable.
@@ -221,7 +221,7 @@
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
-            this.Name = "FrmTestStart";
+            this.Name = "StartTestForm";
             this.Text = "Impostazioni test";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

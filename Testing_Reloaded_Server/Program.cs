@@ -16,7 +16,7 @@ namespace Testing_Reloaded_Server
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FrmTestStart());
+            Application.Run(new StartTestForm());
         }
     }
 }
