@@ -37,5 +37,15 @@ namespace Testing_Reloaded_Client {
         private void BtnUpdateServers_Click(object sender, EventArgs e) {
             UpdateServerList();
         }
+
+        private void btnJoin_Click(object sender, EventArgs e) {
+            if (cmbServers.SelectedIndex == -1 || txtName.Text == "" || txtSurname.Text == "")
+                return;
+
+            var mainForm = new frmTest(cmbServers.SelectedItem as Server, new SharedLibrary.User() { Name = txtName.Text, Surname= txtSurname.Text });
+            mainForm.Show();
+            this.Hide();
+
+        }
     }
 }
