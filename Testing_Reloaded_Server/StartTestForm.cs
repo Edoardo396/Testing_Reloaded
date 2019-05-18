@@ -12,7 +12,6 @@ using Testing_Reloaded_Server.Networking;
 
 namespace Testing_Reloaded_Server {
     public partial class StartTestForm : Form {
-
         private ServerPublishingManager publishManager;
         private TestManager testManager;
 
@@ -35,6 +34,11 @@ namespace Testing_Reloaded_Server {
                 DocumentationDirectory = txtDocsDir.Text
             };
 
+
+            groupBox1.Enabled = false;
+            groupBox2.Enabled = false;
+            groupBox3.Enabled = false;
+
             publishManager = new ServerPublishingManager(test) {AllowClientsOnHold = true};
             testManager = new TestManager(test);
 
@@ -42,8 +46,11 @@ namespace Testing_Reloaded_Server {
         }
 
         private async void BtnStartTest_Click(object sender, EventArgs e) {
-            await testManager.StartTest();
+            if (testManager == null)
+                BtnWaitForClients_Click(null, null);
 
+
+            await testManager.StartTest();
         }
     }
 }

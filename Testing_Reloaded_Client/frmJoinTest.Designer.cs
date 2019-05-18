@@ -35,7 +35,7 @@
             this.txtName = new System.Windows.Forms.TextBox();
             this.txtSurname = new System.Windows.Forms.TextBox();
             this.btnJoin = new System.Windows.Forms.Button();
-            this.btnUpdateServers = new System.Windows.Forms.Button();
+            this.btnRefresh = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // cmbServers
@@ -100,22 +100,22 @@
             this.btnJoin.UseVisualStyleBackColor = true;
             this.btnJoin.Click += new System.EventHandler(this.btnJoin_Click);
             // 
-            // btnUpdateServers
+            // btnRefresh
             // 
-            this.btnUpdateServers.Location = new System.Drawing.Point(327, 16);
-            this.btnUpdateServers.Name = "btnUpdateServers";
-            this.btnUpdateServers.Size = new System.Drawing.Size(69, 23);
-            this.btnUpdateServers.TabIndex = 7;
-            this.btnUpdateServers.Text = "Aggiorna";
-            this.btnUpdateServers.UseVisualStyleBackColor = true;
-            this.btnUpdateServers.Click += new System.EventHandler(this.BtnUpdateServers_Click);
+            this.btnRefresh.Location = new System.Drawing.Point(327, 16);
+            this.btnRefresh.Name = "btnRefresh";
+            this.btnRefresh.Size = new System.Drawing.Size(69, 23);
+            this.btnRefresh.TabIndex = 7;
+            this.btnRefresh.Text = "Aggiorna";
+            this.btnRefresh.UseVisualStyleBackColor = true;
+            this.btnRefresh.Click += new System.EventHandler(this.BtnUpdateServers_Click);
             // 
             // frmJoinTest
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(468, 177);
-            this.Controls.Add(this.btnUpdateServers);
+            this.Controls.Add(this.btnRefresh);
             this.Controls.Add(this.btnJoin);
             this.Controls.Add(this.txtSurname);
             this.Controls.Add(this.txtName);
@@ -139,7 +139,7 @@
         private System.Windows.Forms.TextBox txtName;
         private System.Windows.Forms.TextBox txtSurname;
         private System.Windows.Forms.Button btnJoin;
-        private System.Windows.Forms.Button btnUpdateServers;
+        private System.Windows.Forms.Button btnRefresh;
     }
 }
 

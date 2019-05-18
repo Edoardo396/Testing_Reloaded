@@ -18,18 +18,26 @@ namespace Testing_Reloaded_Client {
 
         protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
-            cmbServers.DisplayMember = "Hostname";
-            cmbServers.ValueMember = "IP";
-
+           
             UpdateServerList();
         }
 
 
         private void UpdateServerList() {
+            btnRefresh.Enabled = false;
+
             serverManager.GetServers().ContinueWith(task => {
                 cmbServers.Invoke(new Action(() => {
+                    cmbServers.DataSource = null;
+                    cmbServers.DisplayMember = "Hostname";
+                    cmbServers.ValueMember = "IP";
+
                     cmbServers.DataSource = serverManager.Servers;
                     cmbServers.Enabled = true;
+                    btnRefresh.Enabled = true;
+
+                    if (cmbServers.Items.Count > 0)
+                        cmbServers.SelectedIndex = 0;
                 }));
             });
         }

@@ -57,6 +57,7 @@
             this.txtTestName.Name = "txtTestName";
             this.txtTestName.Size = new System.Drawing.Size(252, 20);
             this.txtTestName.TabIndex = 0;
+            this.txtTestName.Tag = "onlybefore";
             this.txtTestName.Text = "ASP";
             // 
             // label1
@@ -83,6 +84,7 @@
             this.chbTime.Name = "chbTime";
             this.chbTime.Size = new System.Drawing.Size(252, 20);
             this.chbTime.TabIndex = 2;
+            this.chbTime.Tag = "onlybefore";
             this.chbTime.Text = "01:00:00";
             // 
             // groupBox1
@@ -107,6 +109,7 @@
             this.chbDelete.Name = "chbDelete";
             this.chbDelete.Size = new System.Drawing.Size(210, 17);
             this.chbDelete.TabIndex = 5;
+            this.chbDelete.Tag = "onlybefore";
             this.chbDelete.Text = "Canella file dal client dopo la consegna";
             this.chbDelete.UseVisualStyleBackColor = true;
             // 
@@ -117,6 +120,7 @@
             this.chbRitira.Name = "chbRitira";
             this.chbRitira.Size = new System.Drawing.Size(177, 17);
             this.chbRitira.TabIndex = 4;
+            this.chbRitira.Tag = "onlybefore";
             this.chbRitira.Text = "Ritira immediatamente al termine";
             this.chbRitira.UseVisualStyleBackColor = true;
             // 
@@ -137,6 +141,7 @@
             this.txtDataDownloadPath.Name = "txtDataDownloadPath";
             this.txtDataDownloadPath.Size = new System.Drawing.Size(204, 20);
             this.txtDataDownloadPath.TabIndex = 1;
+            this.txtDataDownloadPath.Tag = "onlybefore";
             this.txtDataDownloadPath.Text = "%USERPROFILE%\\Desktop\\Temporanea\\$test_name_$surname";
             // 
             // label3
@@ -174,6 +179,7 @@
             this.txtDocsDir.Name = "txtDocsDir";
             this.txtDocsDir.Size = new System.Drawing.Size(223, 20);
             this.txtDocsDir.TabIndex = 6;
+            this.txtDocsDir.Tag = "onlybefore";
             this.txtDocsDir.Text = "C:\\Users\\Edo\\Desktop\\Temporanea\\QuestionarioOnLine";
             // 
             // btnWaitForClients

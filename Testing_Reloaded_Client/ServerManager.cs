@@ -35,6 +35,8 @@ namespace Testing_Reloaded_Client {
 
                     var jobj = JObject.Parse(SharedLibrary.Constants.USED_ENCODING.GetString(received.Buffer));
 
+                    foundServers.Clear();
+
                     foundServers.Add(new Server() {
                         Hostname = jobj["Hostname"].ToString(),
                         IP = received.RemoteEndPoint.Address

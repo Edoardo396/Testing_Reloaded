@@ -10,7 +10,6 @@ using Testing_Reloaded_Server.Networking;
 
 namespace Testing_Reloaded_Server {
     public class TestManager {
-
         private ServerTest currentTest;
         private ClientsManager clientsManager;
 
@@ -41,19 +40,22 @@ namespace Testing_Reloaded_Server {
         }
 
         private string ClientsManagerOnReceivedMessageFromClient(Client c, JObject message) {
-
             if (message["Action"].ToString() == "GetTestInfo") {
                 return JsonConvert.SerializeObject(new {Status = "OK", Test = currentTest as Test});
             }
 
             if (message["Action"].ToString() == "GetTestDocs") {
-
                 if (currentTest.State == Test.TestState.NotStarted)
-                    return JsonConvert.SerializeObject(new { Status = "ERROR", Code = "TSTNSTART", Message = "Test is not started, cannot get docs" });
+                    return JsonConvert.SerializeObject(new
+                        {Status = "ERROR", Code = "TSTNSTART", Message = "Test is not started, cannot get docs"});
+
+                if (string.IsNullOrEmpty(currentTest.DocumentationDirectory))
+                    return JsonConvert.SerializeObject(new {Status = "OK", FileType = "nodata", Size = 0});
 
                 clientsManager.SendBytes(c, DocumentationZip);
 
-                return JsonConvert.SerializeObject(new { Status = "OK" }); ;
+                return JsonConvert.SerializeObject(new {Status = "OK"});
+               
             }
 
 
