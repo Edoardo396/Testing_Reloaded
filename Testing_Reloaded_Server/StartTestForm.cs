@@ -26,7 +26,7 @@ namespace Testing_Reloaded_Server {
 
         private void BtnWaitForClients_Click(object sender, EventArgs e) {
             var test = new ServerTest() {
-                DataDownloadPath = txtDataDownloadPath.Text,
+                ClientTestPath = txtDataDownloadPath.Text,
                 DeleteFilesAfterEnd = chbDelete.Checked,
                 ReclaimTestImmediately = chbRitira.Checked,
                 TestName = txtTestName.Text,

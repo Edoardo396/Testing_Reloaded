@@ -41,11 +41,17 @@ namespace Testing_Reloaded_Client {
 
             await testManager.WaitForTestStart();
 
-            lblTestDir.Text = testManager.ResolvePath(testManager.CurrentTest.DataDownloadPath);
+            lblTestDir.Text = testManager.ResolvePath(testManager.CurrentTest.ClientTestPath);
             lblCurrentOperation.Text = "Download documentazione";
             await testManager.DownloadTestDocumentation();
 
+            lblCurrentOperation.Visible = false;
+            progressBar1.Visible = false;
 
+            string message =
+                $"Il test è iniziato.\r\nLa cartella del test è {testManager.ResolvePath(testManager.CurrentTest.ClientTestPath)} puoi trovare la documentazione del test nella sottocartella Documentation se è disponibile. Quando consegnerai veraano inviati tutti i file che si trovano nella cartella del test. in bocca al lupo!";
+
+            MessageBox.Show(message, "Test iniziato", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

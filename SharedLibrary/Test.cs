@@ -11,7 +11,7 @@ namespace SharedLibrary {
 
         public string TestName { get; set; }
         public TimeSpan Time { get; set; }
-        public string DataDownloadPath { get; set; }
+        public string ClientTestPath { get; set; }
         public bool ReclaimTestImmediately { get; set; }
         public bool DeleteFilesAfterEnd { get; set; }
         public TestState State { get; set; }

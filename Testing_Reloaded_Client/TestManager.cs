@@ -45,7 +45,7 @@ namespace Testing_Reloaded_Client {
         }
 
         public async Task DownloadTestDocumentation() {
-            string path = ResolvePath(currentTest.DataDownloadPath);
+            string path = ResolvePath(currentTest.ClientTestPath);
             if (Directory.Exists(path))
                 Directory.Delete(path, true);
             Directory.CreateDirectory(path);
@@ -61,9 +61,11 @@ namespace Testing_Reloaded_Client {
 
             if (fileBytes == null) return;
 
+            Directory.CreateDirectory(Path.Combine(path, "Documentation"));
+
             var file = new MemoryStream(fileBytes);
 
-            fastZip.ExtractZip(file, ResolvePath(currentTest.DataDownloadPath), FastZip.Overwrite.Always, null, "",
+            fastZip.ExtractZip(file, Path.Combine(path, "Documentation"), FastZip.Overwrite.Always, null, "",
                 null, false, true);
         }
 
