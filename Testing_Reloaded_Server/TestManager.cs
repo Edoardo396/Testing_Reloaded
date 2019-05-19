@@ -75,7 +75,7 @@ namespace Testing_Reloaded_Server {
 
         public async Task StartTest() {
             currentTest.State = Test.TestState.Started;
-            await clientsManager.SendMessageToClients(JsonConvert.SerializeObject(new {Action = "TestStarted"}));
+            await clientsManager.SendMessageToClients(JsonConvert.SerializeObject(new {Action = "TestStarted"}), false);
         }
     }
 }

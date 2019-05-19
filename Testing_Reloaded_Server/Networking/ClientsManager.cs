@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -33,7 +34,7 @@ namespace Testing_Reloaded_Server.Networking {
 
         public void Start() {
             tcpListener = new TcpListener(new IPEndPoint(IPAddress.Any, SharedLibrary.Constants.SERVER_PORT));
-            clientsThread = new Thread(LoopClients);
+            clientsThread = new Thread(LoopClients) {Name = "LoopingThread", IsBackground = true };
             clientsThread.Start();
         }
 
@@ -42,7 +43,7 @@ namespace Testing_Reloaded_Server.Networking {
 
             while (running) {
                 var newClient = tcpListener.AcceptTcpClient();
-                var thread = new Thread(new ParameterizedThreadStart(HandleClient));
+                var thread = new Thread(new ParameterizedThreadStart(HandleClient)) {IsBackground = true};
                 thread.Start(newClient);
             }
         }
@@ -71,8 +72,11 @@ namespace Testing_Reloaded_Server.Networking {
                 JObject data = JObject.Parse(json);
 
                 if (data["Action"].ToString() == "Connect") {
-                    connectedClient = new Client(JsonConvert.DeserializeObject<User>(data["User"].ToString()), client) {TestState = new UserTestState() {State = UserTestState.UserState.Connected}};
+                    int nextId = clients.Count == 0 ? 0 : clients.Max(ob => ob.Id) + 1;
 
+                    connectedClient = new Client(nextId, JsonConvert.DeserializeObject<User>(data["User"].ToString()), client) {TestState = new UserTestState() {State = UserTestState.UserState.Connected}};
+
+                    Thread.CurrentThread.Name = $"{connectedClient.Surname}Thread";
                     clients.Add(connectedClient);
                     sWriter.WriteLine(JsonConvert.SerializeObject(new { Status = "OK" }));
                     sWriter.Flush();                    
@@ -81,6 +85,7 @@ namespace Testing_Reloaded_Server.Networking {
                 if (connectedClient == null) {
                     sWriter.WriteLine(JsonConvert.SerializeObject(new {Status = "ERROR", Code = "SYNFIRST", Message = "Client must call Connect first"}));
                     sWriter.Flush();
+                    continue;
                 }
 
                 string response = this.ReceivedMessageFromClient?.Invoke(connectedClient, data);
@@ -107,11 +112,17 @@ namespace Testing_Reloaded_Server.Networking {
             stream.Flush();
         }
 
-        public async Task SendMessageToClients(string message) {
+        public async Task SendMessageToClients(string message, bool blocking = true) {
             foreach (Client client in Clients) {
                 var stream = new StreamWriter(client.TcpClient.GetStream());
-                await stream.WriteLineAsync(message);
-                await stream.FlushAsync();
+
+                if (blocking) {
+                    await stream.WriteLineAsync(message);
+                    await stream.FlushAsync();
+                } else {
+                    stream.WriteLineAsync(message);
+                    stream.FlushAsync();
+                }
             }
         }
     }

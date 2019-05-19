@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 
 namespace SharedLibrary {
     public class UserTestState {
@@ -12,6 +13,8 @@ namespace SharedLibrary {
             Finished,
             Crashed
         }
+
+       
 
         public TimeSpan RemainingTime { get; set; }
         public UserState State { get; set; }

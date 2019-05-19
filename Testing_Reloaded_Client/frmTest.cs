@@ -18,6 +18,19 @@ namespace Testing_Reloaded_Client {
             InitializeComponent();
 
             testManager = new TestManager(selectedServer, me);
+            testManager.ReloadUI += ReloadUi;
+        }
+
+        private void ReloadUi() {
+            lblTestName.Text = testManager.CurrentTest.TestName;
+            lblTestDuration.Text = testManager.CurrentTest.Time.ToString();
+            lblRemainingTime.Text = testManager.CurrentTest.Time.ToString();
+
+            if (testManager.CurrentTest.State != Test.TestState.NotStarted)
+                lblTestDir.Text = testManager.ResolvedTestPath;
+
+            lblStatus.Text = testManager.CurrentTest.State.ToString();
+            lblStatus.BackColor = testManager.CurrentTest.State.TestStateToColor();
         }
 
 
@@ -32,16 +45,14 @@ namespace Testing_Reloaded_Client {
             lblCurrentOperation.Text = "Download Dati Test";
 
             await testManager.DownloadTestData();
-            lblTestName.Text = testManager.CurrentTest.TestName;
-            lblTestDuration.Text = testManager.CurrentTest.Time.ToString();
-            lblRemainingTime.Text = testManager.CurrentTest.Time.ToString();
+            ReloadUi();
 
             lblTestDir.Text = "Attendo inizio del test";
             lblCurrentOperation.Text = "Attendo Inizio";
 
             await testManager.WaitForTestStart();
+            ReloadUi();
 
-            lblTestDir.Text = testManager.ResolvePath(testManager.CurrentTest.ClientTestPath);
             lblCurrentOperation.Text = "Download documentazione";
             await testManager.DownloadTestDocumentation();
 
@@ -49,23 +60,27 @@ namespace Testing_Reloaded_Client {
             progressBar1.Visible = false;
 
             string message =
-                $"Il test è iniziato.\r\nLa cartella del test è {testManager.ResolvePath(testManager.CurrentTest.ClientTestPath)} puoi trovare la documentazione del test nella sottocartella Documentation se è disponibile. Quando consegnerai veraano inviati tutti i file che si trovano nella cartella del test. in bocca al lupo!";
+                $"Il test è iniziato.\r\nLa cartella del test è {testManager.ResolvedTestPath} puoi trovare la documentazione del test nella sottocartella Documentation se è disponibile. Quando consegnerai veraano inviati tutti i file che si trovano nella cartella del test. in bocca al lupo!";
 
             MessageBox.Show(message, "Test iniziato", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-            System.Diagnostics.Process.Start(testManager.ResolvePath(testManager.CurrentTest.ClientTestPath));
+            System.Diagnostics.Process.Start(testManager.ResolvedTestPath);
 
 
             testManager.TestState.State = UserTestState.UserState.Testing;
             await testManager.SendStateUpdate();
 
             testTimer.Start();
+            ReloadUi();
         }
 
         private void TestTimer_Tick(object sender, EventArgs e) {
             testManager.TimeElapsed((uint) (testTimer.Interval / 1000));
             lblRemainingTime.Text = testManager.TestState.RemainingTime.ToString();
+        }
 
+        private void BtnOpenTestDir_Click(object sender, EventArgs e) {
+            System.Diagnostics.Process.Start(testManager.ResolvedTestPath);
         }
     }
 }

@@ -50,9 +50,6 @@ namespace Testing_Reloaded_Server {
             if (testManager == null)
                 BtnWaitForClients_Click(null, null);
 
-
-            await testManager.StartTest();
-
             var testForm = new TestForm(testManager);
             testForm.Closed += (o, args) => this.Close();
 

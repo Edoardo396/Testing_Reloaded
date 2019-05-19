@@ -17,6 +17,10 @@ namespace Testing_Reloaded_Client {
 
         public Test CurrentTest => currentTest;
 
+        public string ResolvedTestPath => this.ResolvePath(this.currentTest.ClientTestPath);
+
+        public event Action ReloadUI;
+
         public TestManager(Server server, User me) {
             this.me = me;
             this.netManager = new NetworkManager(server);
@@ -44,7 +48,7 @@ namespace Testing_Reloaded_Client {
             var jsonResponse = JObject.Parse(response);
 
             this.currentTest = JsonConvert.DeserializeObject<Test>(jsonResponse["Test"].ToString());
-            TestState = new UserTestState { RemainingTime = currentTest.Time, State = UserTestState.UserState.Waiting};
+            TestState = new UserTestState {RemainingTime = currentTest.Time, State = UserTestState.UserState.Waiting};
         }
 
         public async Task WaitForTestStart() {
@@ -101,7 +105,6 @@ namespace Testing_Reloaded_Client {
 
             if (TestState.RemainingTime.Seconds == 0)
                 SendStateUpdate();
-            
         }
     }
 }

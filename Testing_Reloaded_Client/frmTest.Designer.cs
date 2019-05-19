@@ -42,11 +42,17 @@
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.lblCurrentOperation = new System.Windows.Forms.Label();
             this.testTimer = new System.Windows.Forms.Timer(this.components);
+            this.btnOpenTestDir = new System.Windows.Forms.Button();
+            this.lblStatus = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
             this.grbTestInfo.SuspendLayout();
             this.SuspendLayout();
             // 
             // grbTestInfo
             // 
+            this.grbTestInfo.Controls.Add(this.lblStatus);
+            this.grbTestInfo.Controls.Add(this.label5);
+            this.grbTestInfo.Controls.Add(this.btnOpenTestDir);
             this.grbTestInfo.Controls.Add(this.lblTestDuration);
             this.grbTestInfo.Controls.Add(this.label6);
             this.grbTestInfo.Controls.Add(this.lblTestName);
@@ -167,6 +173,37 @@
             this.testTimer.Interval = 1000;
             this.testTimer.Tick += new System.EventHandler(this.TestTimer_Tick);
             // 
+            // btnOpenTestDir
+            // 
+            this.btnOpenTestDir.Location = new System.Drawing.Point(12, 257);
+            this.btnOpenTestDir.Name = "btnOpenTestDir";
+            this.btnOpenTestDir.Size = new System.Drawing.Size(75, 23);
+            this.btnOpenTestDir.TabIndex = 9;
+            this.btnOpenTestDir.Text = "Apri";
+            this.btnOpenTestDir.UseVisualStyleBackColor = true;
+            this.btnOpenTestDir.Click += new System.EventHandler(this.BtnOpenTestDir_Click);
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.AutoSize = true;
+            this.lblStatus.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.lblStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblStatus.Location = new System.Drawing.Point(73, 125);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(68, 20);
+            this.lblStatus.TabIndex = 11;
+            this.lblStatus.Text = "Testing";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(9, 125);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(58, 20);
+            this.label5.TabIndex = 10;
+            this.label5.Text = "Stato:";
+            // 
             // frmTest
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -198,5 +235,8 @@
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Label lblCurrentOperation;
         private System.Windows.Forms.Timer testTimer;
+        private System.Windows.Forms.Button btnOpenTestDir;
+        private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.Label label5;
     }
 }
