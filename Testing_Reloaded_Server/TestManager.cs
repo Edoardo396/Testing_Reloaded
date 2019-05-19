@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip;
 using Newtonsoft.Json;
@@ -68,9 +69,35 @@ namespace Testing_Reloaded_Server {
                 c.TestState = JsonConvert.DeserializeObject<UserTestState>(message["State"].ToString());
             }
 
+            if (message["Action"].ToString() == "TestHandover") {
+                return GetUserTest(c);
+            }
+
             ClientStatusUpdated?.Invoke(c);
 
             return null;
+        }
+
+        private string GetUserTest(Client c) {
+
+            var stream = c.TcpClient.GetStream();
+            var sReader = new StreamReader(stream, SharedLibrary.Constants.USED_ENCODING);
+            var dataInfo = JObject.Parse(sReader.ReadLine());
+
+            int size = (int) dataInfo["Size"];
+
+            var bytes = new byte[size];
+            var bReader = new BinaryReader(stream, Encoding.Default);
+
+            bytes = bReader.ReadBytes(bytes.Length);
+
+            var memoryStream = new MemoryStream(bytes);
+
+            var fastZip = new FastZip();
+
+            fastZip.ExtractZip(memoryStream, Path.Combine(currentTest.DocumentationDirectory, c.ToString()), FastZip.Overwrite.Always, null, null, null, true, true);
+
+            return JsonConvert.SerializeObject(new {Status = "OK"});
         }
 
         public async Task StartTest() {

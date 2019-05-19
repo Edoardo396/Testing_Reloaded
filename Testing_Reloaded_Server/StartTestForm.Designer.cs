@@ -85,7 +85,7 @@
             this.chbTime.Size = new System.Drawing.Size(252, 20);
             this.chbTime.TabIndex = 2;
             this.chbTime.Tag = "onlybefore";
-            this.chbTime.Text = "01:00:00";
+            this.chbTime.Text = "00:00:30";
             // 
             // groupBox1
             // 

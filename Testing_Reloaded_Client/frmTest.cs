@@ -22,15 +22,19 @@ namespace Testing_Reloaded_Client {
         }
 
         private void ReloadUi() {
-            lblTestName.Text = testManager.CurrentTest.TestName;
-            lblTestDuration.Text = testManager.CurrentTest.Time.ToString();
-            lblRemainingTime.Text = testManager.CurrentTest.Time.ToString();
+            this.Invoke(new Action(() => {
+                lblTestName.Text = testManager.CurrentTest.TestName;
+                lblTestDuration.Text = testManager.CurrentTest.Time.ToString();
+                lblRemainingTime.Text = testManager.CurrentTest.Time.ToString();
 
-            if (testManager.CurrentTest.State != Test.TestState.NotStarted)
-                lblTestDir.Text = testManager.ResolvedTestPath;
+                if (testManager.CurrentTest.State != Test.TestState.NotStarted)
+                    lblTestDir.Text = testManager.ResolvedTestPath;
 
-            lblStatus.Text = testManager.CurrentTest.State.ToString();
-            lblStatus.BackColor = testManager.CurrentTest.State.TestStateToColor();
+                lblStatus.Text = testManager.TestState.State.ToString();
+                lblStatus.BackColor = testManager.TestState.State.UserStateToColor();
+
+                btnConsegna.Enabled = testManager.TestState.State == UserTestState.UserState.Testing;
+            }));
         }
 
 
@@ -74,13 +78,65 @@ namespace Testing_Reloaded_Client {
             ReloadUi();
         }
 
-        private void TestTimer_Tick(object sender, EventArgs e) {
+        private async void TestTimer_Tick(object sender, EventArgs e) {
             testManager.TimeElapsed((uint) (testTimer.Interval / 1000));
             lblRemainingTime.Text = testManager.TestState.RemainingTime.ToString();
+
+            TimeSpan remainingTime = testManager.TestState.RemainingTime;
+
+            if (Math.Abs(remainingTime.TotalSeconds) < 1) {
+                MessageBox.Show(
+                    $"Il tempo è scaduto, hai un minuto per salvare e chiudere tutti i programmi che stanno usando la cartella {testManager.ResolvedTestPath}, dopodichè il file verrà inviato al server e tutte le modifiche andranno inevitabilmente perse",
+                    "Tempo Scaduto", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+
+            if (Math.Abs(remainingTime.TotalSeconds + 30.0) < 1) {
+                progressBar1.Visible = true;
+                lblCurrentOperation.Visible = true;
+                lblCurrentOperation.Text = "Consegna in corso";
+
+                testTimer.Stop();
+                MessageBox.Show("Tempo scaduto, invio in corso...", "Fine della prova", MessageBoxButtons.OK,
+                    MessageBoxIcon.Exclamation);
+
+                testManager.TestState.State = UserTestState.UserState.Finished;
+                
+                await testManager.Handover();
+
+                ReloadUi();
+
+                progressBar1.Visible = false;
+                lblCurrentOperation.Visible = false;
+
+                MessageBox.Show("Consegnato, ora si può chiudere RTesting", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         private void BtnOpenTestDir_Click(object sender, EventArgs e) {
             System.Diagnostics.Process.Start(testManager.ResolvedTestPath);
+        }
+
+        private async void BtnConsegna_Click(object sender, EventArgs e) {
+
+            progressBar1.Visible = true;
+            lblCurrentOperation.Visible = true;
+            lblCurrentOperation.Text = "Consegna in corso";
+
+            if (MessageBox.Show(
+                    $"ATTENZIONE: SALVARE E CHIUDERE TUTTI I PROGRAMMI CHE STANNO USANDO LA DIRECTORY {testManager.ResolvedTestPath} ALTREMENTI LE MODIFICHE NON VERRANNO SALVATE. PREMERE OK PER CONTINUARE. VUOI CONTINUARE?",
+                    "Waiting Closure", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No) {
+                return;
+            }
+
+            testTimer.Stop();
+            testManager.TestState.State = UserTestState.UserState.Finished;
+            await testManager.Handover();
+            ReloadUi();
+
+            progressBar1.Visible = false;
+            lblCurrentOperation.Visible = false;
+
+            MessageBox.Show("Consegnato, ora si può chiudere RTesting", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip;
 using Newtonsoft.Json;
@@ -105,6 +107,29 @@ namespace Testing_Reloaded_Client {
 
             if (TestState.RemainingTime.Seconds == 0)
                 SendStateUpdate();
+
+        }
+
+        public async Task Handover() {
+
+            await this.SendStateUpdate();
+
+            await netManager.WriteLine(JsonConvert.SerializeObject(new {Action = "TestHandover"}));
+
+            var fastZip = new FastZip();
+
+            var stream = new MemoryStream();
+
+            fastZip.CreateZip(stream, ResolvedTestPath, true, null, @"-bin$;-obj$;-Documentation$");
+
+            netManager.SendBytes(stream.ToArray());
+
+            var json = JObject.Parse(await netManager.ReadLine());
+
+            if (json["Status"].ToString() != "OK") {
+                throw new Exception("Server returned wrong message");
+            }
+
         }
     }
 }

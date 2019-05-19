@@ -59,5 +59,19 @@ namespace Testing_Reloaded_Client {
 
             return bytes;
         }
+
+        public void SendBytes(byte[] bytes) {
+            var stream = tcpConnection.GetStream();
+            var wStream = new StreamWriter(stream);
+
+            wStream.WriteLine(JsonConvert.SerializeObject(new {Status = "OK", FileType = "zip", Size = bytes.Length}));
+            wStream.Flush();
+
+            foreach (byte b in bytes) {
+                stream.WriteByte(b);
+            }
+
+            stream.Flush();
+        }
     }
 }
