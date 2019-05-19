@@ -23,8 +23,9 @@ namespace Testing_Reloaded_Server {
 
             lvClients.View = View.Details;
 
-            int width = lvClients.Width / 4;
+            int width = lvClients.Width / 5;
 
+            lvClients.Columns.Add(new ColumnHeader("clmId") { Text = "ClientID", Width = width });
             lvClients.Columns.Add(new ColumnHeader("clmName") {Text = "Nome", Width = width});
             lvClients.Columns.Add(new ColumnHeader("clmPC") {Text = "Computer", Width = width});
             lvClients.Columns.Add(new ColumnHeader("clmTime") {Text = "Tempo", Width = width});
@@ -40,11 +41,12 @@ namespace Testing_Reloaded_Server {
             lvClients.Invoke(new Action(() => {
                 lvClients.Items.Clear();
                 foreach (Client client in testManager.ConnectedClients) {
-                    var item = new ListViewItem(client.ToString());
+                    var item = new ListViewItem(client.Id.ToString());
 
                     string state = client.TestState?.State.ToString();
                     string rtime = client.TestState?.RemainingTime.ToString();
 
+                    item.SubItems.Add(client.ToString());
                     item.SubItems.Add(client.PCHostname);
                     item.SubItems.Add(rtime ?? "N/A");
                     item.SubItems.Add(state ?? "N/A");
@@ -55,6 +57,16 @@ namespace Testing_Reloaded_Server {
                     //  lvClients.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
                 }
             }));
+        }
+
+        private void LvClients_SelectedIndexChanged(object sender, EventArgs e) {
+            if (lvClients.SelectedIndices.Count == 0) {
+                grpClientControls.Enabled = false;
+                return;
+            }
+
+            grpClientControls.Enabled = true;
+            lblSelectedClient.Text = lvClients.SelectedItems[0].SubItems[1].Text;
         }
     }
 }
