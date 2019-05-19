@@ -53,12 +53,17 @@ namespace Testing_Reloaded_Client {
 
             MessageBox.Show(message, "Test iniziato", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+            System.Diagnostics.Process.Start(testManager.ResolvePath(testManager.CurrentTest.ClientTestPath));
+
+
+            testManager.TestState.State = UserTestState.UserState.Testing;
+            await testManager.SendStateUpdate();
 
             testTimer.Start();
         }
 
         private void TestTimer_Tick(object sender, EventArgs e) {
-            testManager.TimeElapsed();
+            testManager.TimeElapsed((uint) (testTimer.Interval / 1000));
             lblRemainingTime.Text = testManager.TestState.RemainingTime.ToString();
 
         }

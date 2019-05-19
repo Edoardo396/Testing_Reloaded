@@ -44,7 +44,7 @@ namespace Testing_Reloaded_Client {
             var jsonResponse = JObject.Parse(response);
 
             this.currentTest = JsonConvert.DeserializeObject<Test>(jsonResponse["Test"].ToString());
-            TestState = new UserTestState { RemainingTime = currentTest.Time };
+            TestState = new UserTestState { RemainingTime = currentTest.Time, State = UserTestState.UserState.Waiting};
         }
 
         public async Task WaitForTestStart() {
@@ -62,6 +62,8 @@ namespace Testing_Reloaded_Client {
         }
 
         public async Task DownloadTestDocumentation() {
+            TestState.State = UserTestState.UserState.DownloadingDocs;
+
             string path = ResolvePath(currentTest.ClientTestPath);
             if (Directory.Exists(path))
                 Directory.Delete(path, true);
@@ -86,11 +88,20 @@ namespace Testing_Reloaded_Client {
                 null, false, true);
         }
 
+        public async Task SendStateUpdate() {
+            string json = JsonConvert.SerializeObject(new {Action = "StateUpdate", State = TestState});
+
+            await netManager.WriteLine(json);
+        }
 
         // must be called every 1 second
-        public void TimeElapsed() {
+        public void TimeElapsed(uint seconds) {
             if (currentTest.State == Test.TestState.Started)
-                TestState.RemainingTime -= TimeSpan.FromSeconds(1);
+                TestState.RemainingTime -= TimeSpan.FromSeconds(seconds);
+
+            if (TestState.RemainingTime.Seconds == 0)
+                SendStateUpdate();
+            
         }
     }
 }

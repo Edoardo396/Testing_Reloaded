@@ -180,7 +180,7 @@
             this.txtDocsDir.Size = new System.Drawing.Size(223, 20);
             this.txtDocsDir.TabIndex = 6;
             this.txtDocsDir.Tag = "onlybefore";
-            this.txtDocsDir.Text = "C:\\Users\\Edo\\Desktop\\Temporanea\\QuestionarioOnLine";
+            this.txtDocsDir.Text = "C:\\Users\\Edo\\Desktop\\Progetti In Corso\\.idea";
             // 
             // btnWaitForClients
             // 

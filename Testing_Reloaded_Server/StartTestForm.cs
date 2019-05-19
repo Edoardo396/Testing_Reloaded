@@ -52,6 +52,12 @@ namespace Testing_Reloaded_Server {
 
 
             await testManager.StartTest();
+
+            var testForm = new TestForm(testManager);
+            testForm.Closed += (o, args) => this.Close();
+
+            testForm.Show();
+            this.Hide();
         }
     }
 }

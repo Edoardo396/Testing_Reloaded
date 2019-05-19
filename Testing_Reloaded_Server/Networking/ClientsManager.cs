@@ -71,12 +71,11 @@ namespace Testing_Reloaded_Server.Networking {
                 JObject data = JObject.Parse(json);
 
                 if (data["Action"].ToString() == "Connect") {
-                    connectedClient = new Client(JsonConvert.DeserializeObject<User>(data["User"].ToString()), client);
+                    connectedClient = new Client(JsonConvert.DeserializeObject<User>(data["User"].ToString()), client) {TestState = new UserTestState() {State = UserTestState.UserState.Connected}};
 
                     clients.Add(connectedClient);
                     sWriter.WriteLine(JsonConvert.SerializeObject(new { Status = "OK" }));
-                    sWriter.Flush();
-                    continue;
+                    sWriter.Flush();                    
                 }
 
                 if (connectedClient == null) {

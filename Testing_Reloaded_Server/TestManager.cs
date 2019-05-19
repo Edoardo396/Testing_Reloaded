@@ -15,6 +15,10 @@ namespace Testing_Reloaded_Server {
 
         public BindingList<Client> ConnectedClients => clientsManager.Clients;
 
+        public delegate void ClientStatusUpdatedDelegate(Client c);
+        public event ClientStatusUpdatedDelegate ClientStatusUpdated;
+
+
         private byte[] documentationZip;
 
         private byte[] DocumentationZip {
@@ -49,6 +53,8 @@ namespace Testing_Reloaded_Server {
                     return JsonConvert.SerializeObject(new
                         {Status = "ERROR", Code = "TSTNSTART", Message = "Test is not started, cannot get docs"});
 
+                c.TestState.State = UserTestState.UserState.DownloadingDocs;
+
                 if (string.IsNullOrEmpty(currentTest.DocumentationDirectory))
                     return JsonConvert.SerializeObject(new {Status = "OK", FileType = "nodata", Size = 0});
 
@@ -58,6 +64,11 @@ namespace Testing_Reloaded_Server {
                
             }
 
+            if (message["Action"].ToString() == "StateUpdate") {
+                c.TestState = JsonConvert.DeserializeObject<UserTestState>(message["State"].ToString());
+            }
+
+            ClientStatusUpdated?.Invoke(c);
 
             return null;
         }
