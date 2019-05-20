@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Windows.Forms;
+using SharedLibrary.Models;
 using SharedLibrary.Statics;
 using Testing_Reloaded_Server.Models;
+using Testing_Reloaded_Server.Networking;
 
 namespace Testing_Reloaded_Server.UI {
     public partial class TestForm : Form {
+
+        private ServerPublishingManager publishingManager;
         private TestManager testManager;
 
         public TestForm(TestManager manager) {
@@ -14,6 +18,8 @@ namespace Testing_Reloaded_Server.UI {
 
         protected override async void OnLoad(EventArgs e) {
             base.OnLoad(e);
+
+            publishingManager = new ServerPublishingManager(testManager.CurrentTest) {AllowClientsOnHold = true};
 
             lvClients.View = View.Details;
 
@@ -66,6 +72,18 @@ namespace Testing_Reloaded_Server.UI {
             await testManager.StartTest();
             btnTestStart.Enabled = false;
             MessageBox.Show("Test avviato", "Test Started", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private async void Button4_Click(object sender, EventArgs e) {
+            if (testManager.CurrentTest.State == Test.TestState.Started) {
+                await testManager.SetTestState(Test.TestState.OnHold);
+                btnTestPause.Text = "Riavvia Test";
+            }
+
+            if (testManager.CurrentTest.State == Test.TestState.OnHold) {
+                await testManager.SetTestState(Test.TestState.Started);
+                btnTestPause.Text = "Pausa Test";
+            }
         }
     }
 }

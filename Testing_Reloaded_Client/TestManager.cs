@@ -29,6 +29,27 @@ namespace Testing_Reloaded_Client {
         public TestManager(Server server, User me) {
             this.me = me;
             this.netManager = new NetworkManager(server);
+            netManager.ReceivedMessageFromServer += ReceivedServerMessage;
+        }
+
+        private string ReceivedServerMessage(Server s, JObject message) {
+            if (message["Action"].ToString() == "UpdateTest") {
+                this.currentTest = (Test)message["Test"].ToObject(typeof(Test));
+
+                if (currentTest.State == Test.TestState.OnHold)
+                    this.TestState.State = UserTestState.UserState.OnHold;
+
+                SendStateUpdate();
+                ReloadUI?.Invoke();
+                return null;
+            }
+
+            
+
+
+
+
+            return null;
         }
 
         public string ResolvePath(string path) {
@@ -57,7 +78,7 @@ namespace Testing_Reloaded_Client {
         }
 
         public async Task WaitForTestStart() {
-            if (currentTest.State == Test.TestState.Started) return;
+            if (currentTest.State != Test.TestState.NotStarted) return;
 
             await SendStateUpdate();
 
@@ -97,6 +118,8 @@ namespace Testing_Reloaded_Client {
 
             fastZip.ExtractZip(file, Path.Combine(path, "Documentation"), FastZip.Overwrite.Always, null, "",
                 null, false, true);
+
+            netManager.StartListeningForMessages();
         }
 
         public async Task SendStateUpdate() {

@@ -6,7 +6,6 @@ using Testing_Reloaded_Server.Networking;
 
 namespace Testing_Reloaded_Server.UI {
     public partial class StartTestForm : Form {
-        private ServerPublishingManager publishManager;
         private TestManager testManager;
 
         public StartTestForm() {
@@ -29,7 +28,6 @@ namespace Testing_Reloaded_Server.UI {
                 HandoverDirectory = txtConsegneDir.Text
             };
 
-            publishManager = new ServerPublishingManager(test) { AllowClientsOnHold = true };
             testManager = new TestManager(test);
 
             var testForm = new TestForm(testManager);

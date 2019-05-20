@@ -17,6 +17,7 @@ namespace Testing_Reloaded_Server {
         private ClientsManager clientsManager;
 
         public BindingList<Client> ConnectedClients => clientsManager.Clients;
+        public Test CurrentTest => currentTest;
 
         public delegate void ClientStatusUpdatedDelegate(Client c);
 
@@ -101,6 +102,11 @@ namespace Testing_Reloaded_Server {
         public async Task StartTest() {
             currentTest.State = Test.TestState.Started;
             await clientsManager.SendMessageToClients(JsonConvert.SerializeObject(new {Action = "TestStarted"}), false);
+        }
+
+        public async Task SetTestState(Test.TestState state) {
+            currentTest.State = Test.TestState.OnHold;
+            await clientsManager.SendMessageToClients(JsonConvert.SerializeObject(new { Action = "UpdateTest", Test = currentTest }), false);
         }
     }
 }

@@ -39,9 +39,10 @@
             this.label2 = new System.Windows.Forms.Label();
             this.lvClients = new System.Windows.Forms.ListView();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.btnTestStart = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.btnTestStart = new System.Windows.Forms.Button();
+            this.btnTestPause = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.grpClientControls.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -147,6 +148,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.btnTestPause);
             this.groupBox2.Controls.Add(this.btnTestStart);
             this.groupBox2.Location = new System.Drawing.Point(640, 76);
             this.groupBox2.Name = "groupBox2";
@@ -154,6 +156,16 @@
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Opzioni Test";
+            // 
+            // btnTestStart
+            // 
+            this.btnTestStart.Location = new System.Drawing.Point(16, 239);
+            this.btnTestStart.Name = "btnTestStart";
+            this.btnTestStart.Size = new System.Drawing.Size(90, 33);
+            this.btnTestStart.TabIndex = 13;
+            this.btnTestStart.Text = "Avvia Test";
+            this.btnTestStart.UseVisualStyleBackColor = true;
+            this.btnTestStart.Click += new System.EventHandler(this.BtnTestStart_Click);
             // 
             // label1
             // 
@@ -175,15 +187,15 @@
             this.label4.TabIndex = 3;
             this.label4.Text = "Test";
             // 
-            // btnTestStart
+            // btnTestPause
             // 
-            this.btnTestStart.Location = new System.Drawing.Point(16, 239);
-            this.btnTestStart.Name = "btnTestStart";
-            this.btnTestStart.Size = new System.Drawing.Size(90, 33);
-            this.btnTestStart.TabIndex = 13;
-            this.btnTestStart.Text = "Avvia Test";
-            this.btnTestStart.UseVisualStyleBackColor = true;
-            this.btnTestStart.Click += new System.EventHandler(this.BtnTestStart_Click);
+            this.btnTestPause.Location = new System.Drawing.Point(172, 239);
+            this.btnTestPause.Name = "btnTestPause";
+            this.btnTestPause.Size = new System.Drawing.Size(90, 33);
+            this.btnTestPause.TabIndex = 14;
+            this.btnTestPause.Text = "Pausa Test";
+            this.btnTestPause.UseVisualStyleBackColor = true;
+            this.btnTestPause.Click += new System.EventHandler(this.Button4_Click);
             // 
             // TestForm
             // 
@@ -220,5 +232,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button btnTestStart;
+        private System.Windows.Forms.Button btnTestPause;
     }
 }

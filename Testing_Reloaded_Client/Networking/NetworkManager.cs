@@ -17,10 +17,20 @@ namespace Testing_Reloaded_Client.Networking {
         private StreamReader netReader;
         private StreamWriter netWriter;
 
+        private Thread messageThread;
+
+        public bool DontReadFromSocket { get; set; } = false;
+        public bool ListeningForMessages => messageThread.ThreadState == ThreadState.Running;
+
+        public delegate string ReceivedMessageFromServerDelegate(Server s, JObject message);
+
+        public event ReceivedMessageFromServerDelegate ReceivedMessageFromServer;
+
         public bool Connected => netReader != null && tcpConnection.Connected;
 
         public NetworkManager(Server server) {
             this.currentServer = server;
+            messageThread = new Thread(MessagePool) {Name = "MessageThread", IsBackground =  true};
         }
 
         public async Task ConnectToServer() {
@@ -66,6 +76,29 @@ namespace Testing_Reloaded_Client.Networking {
             }
 
             stream.Flush();
+        }
+
+        public void StartListeningForMessages() {
+            messageThread.Start();
+        }
+
+        private void MessagePool() {
+            while (true) {
+                if (tcpConnection.Available == 0 || DontReadFromSocket) {
+                    Thread.Sleep(500);
+                    continue;
+                }
+
+                string message = ReadLine().Result;
+                var json = JObject.Parse(message);
+
+                string response = ReceivedMessageFromServer?.Invoke(currentServer, json);
+
+                if (response != null) {
+                    WriteLine(response).Wait();
+                }
+            }
+
         }
     }
 }

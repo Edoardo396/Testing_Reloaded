@@ -20,7 +20,7 @@ namespace Testing_Reloaded_Client.Networking {
         public async Task GetServers() {
 
             var client = new UdpClient(Constants.CLIENT_PORT);
-            client.Client.ReceiveTimeout = 1000;
+            client.Client.ReceiveTimeout = 2000;
 
             var json = Constants.USED_ENCODING.GetBytes(JsonConvert.SerializeObject(new { Action = "discover" }));
 
@@ -44,7 +44,7 @@ namespace Testing_Reloaded_Client.Networking {
                    
                 }
 
-            }), Task.Delay(1000));
+            }), Task.Delay(2000));
 
             client.Close();
         }

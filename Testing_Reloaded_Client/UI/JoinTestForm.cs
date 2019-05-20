@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Windows.Forms;
 using SharedLibrary.Models;
 using Testing_Reloaded_Client.Networking;
@@ -42,10 +43,20 @@ namespace Testing_Reloaded_Client.UI {
         }
 
         private void btnJoin_Click(object sender, EventArgs e) {
-            if (cmbServers.SelectedIndex == -1 || txtName.Text == "" || txtSurname.Text == "")
+            Server server = null;
+
+            if ((cmbServers.SelectedIndex == -1 && cmbServers.Text == "" )|| txtName.Text == "" || txtSurname.Text == "")
                 return;
 
-            var mainForm = new TestForm(cmbServers.SelectedItem as Server, new User(txtName.Text, txtSurname.Text, Environment.MachineName));
+            if (IPAddress.TryParse(cmbServers.Text, out IPAddress address)) {
+                server = new Server() {IP = address};
+            }
+
+            if (cmbServers.SelectedIndex != -1) {
+                server = cmbServers.SelectedItem as Server;
+            }
+
+            var mainForm = new TestForm(server, new User(txtName.Text, txtSurname.Text, Environment.MachineName));
             mainForm.Show();
             mainForm.FormClosed += (o, args) => this.Close();
             this.Hide();
