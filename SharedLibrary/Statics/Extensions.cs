@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Drawing;
+using SharedLibrary.Models;
 
-namespace SharedLibrary {
+namespace SharedLibrary.Statics {
     public static class Extensions {
         public static Color UserStateToColor(this UserTestState.UserState s)
         {

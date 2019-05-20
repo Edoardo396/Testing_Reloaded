@@ -2,7 +2,7 @@
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
-namespace SharedLibrary {
+namespace SharedLibrary.Networking {
     public static class NetworkUtils {
 
         public static async Task<MemoryStream> ReadNetworkBytes(NetworkStream network, long bytesToRead, long receiveSize = 1024) {

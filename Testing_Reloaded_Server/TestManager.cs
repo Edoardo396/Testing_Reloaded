@@ -7,6 +7,8 @@ using ICSharpCode.SharpZipLib.Zip;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharedLibrary;
+using SharedLibrary.Models;
+using Testing_Reloaded_Server.Models;
 using Testing_Reloaded_Server.Networking;
 
 namespace Testing_Reloaded_Server {
@@ -80,12 +82,12 @@ namespace Testing_Reloaded_Server {
 
         private string GetUserTest(Client c) {
             var stream = c.TcpClient.GetStream();
-            var sReader = new StreamReader(stream, SharedLibrary.Constants.USED_ENCODING);
+            var sReader = new StreamReader(stream, SharedLibrary.Statics.Constants.USED_ENCODING);
             var dataInfo = JObject.Parse(sReader.ReadLine());
 
             int size = (int) dataInfo["Size"];
 
-            var memoryStream = SharedLibrary.NetworkUtils.ReadNetworkBytes(stream, size, c.TcpClient.ReceiveBufferSize)
+            var memoryStream = SharedLibrary.Networking.NetworkUtils.ReadNetworkBytes(stream, size, c.TcpClient.ReceiveBufferSize)
                 .Result;
 
             var fastZip = new FastZip();

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SharedLibrary {
+namespace SharedLibrary.Statics {
     public class Statics {
 
         private static Random rand;

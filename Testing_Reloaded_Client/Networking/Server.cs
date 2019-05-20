@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Testing_Reloaded_Client {
+namespace Testing_Reloaded_Client.Networking {
     public class Server {
 
         public IPAddress IP { get; set; }

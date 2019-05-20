@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Threading;
 
-namespace SharedLibrary {
+namespace SharedLibrary.UI {
     public class ThreadedBindingList<T> : BindingList<T> {
         private readonly SynchronizationContext ctx;
 

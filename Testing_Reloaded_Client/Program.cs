@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Testing_Reloaded_Client.UI;
 
 namespace Testing_Reloaded_Client
 {
@@ -16,7 +17,7 @@ namespace Testing_Reloaded_Client
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmJoinTest());
+            Application.Run(new JoinTestForm());
         }
     }
 }

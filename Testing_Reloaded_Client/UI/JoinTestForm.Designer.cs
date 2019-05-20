@@ -1,6 +1,6 @@
-﻿namespace Testing_Reloaded_Client
+﻿namespace Testing_Reloaded_Client.UI
 {
-    partial class frmJoinTest
+    partial class JoinTestForm
     {
         /// <summary>
         /// Required designer variable.

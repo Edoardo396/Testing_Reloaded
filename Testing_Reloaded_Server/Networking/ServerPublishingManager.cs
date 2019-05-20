@@ -4,10 +4,9 @@ using System.Net.Sockets;
 using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SharedLibrary;
-using Testing_Reloaded_Server;
+using SharedLibrary.Models;
 
-namespace Testing_Reloaded_Server {
+namespace Testing_Reloaded_Server.Networking {
     public class ServerPublishingManager {
         private Thread udpListenThread;
         private UdpClient listenClient;
@@ -23,21 +22,21 @@ namespace Testing_Reloaded_Server {
         }
 
         private void ListenForNewUdpClients() {
-            listenClient = new UdpClient(new IPEndPoint(IPAddress.Any, SharedLibrary.Constants.SERVER_PORT));
+            listenClient = new UdpClient(new IPEndPoint(IPAddress.Any, SharedLibrary.Statics.Constants.SERVER_PORT));
 
             try {
                 while (true) {
-                    var ep = new IPEndPoint(IPAddress.Any, SharedLibrary.Constants.CLIENT_PORT);
+                    var ep = new IPEndPoint(IPAddress.Any, SharedLibrary.Statics.Constants.CLIENT_PORT);
                     var bytes = listenClient.Receive(ref ep);
-                    var message = SharedLibrary.Constants.USED_ENCODING.GetString(bytes);
+                    var message = SharedLibrary.Statics.Constants.USED_ENCODING.GetString(bytes);
 
                     if (!AllowClientsOnHold) continue;
 
                     var json = JObject.Parse(message);
                     var response = GetResponse(json);
-                    var responseBytes = SharedLibrary.Constants.USED_ENCODING.GetBytes(response);
+                    var responseBytes = SharedLibrary.Statics.Constants.USED_ENCODING.GetBytes(response);
                     listenClient.Send(responseBytes, responseBytes.Length,
-                        new IPEndPoint(ep.Address, SharedLibrary.Constants.CLIENT_PORT));
+                        new IPEndPoint(ep.Address, SharedLibrary.Statics.Constants.CLIENT_PORT));
                 }
             } catch (ThreadAbortException e) {
             }

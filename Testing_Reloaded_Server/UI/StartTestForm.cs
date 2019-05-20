@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using SharedLibrary;
+using SharedLibrary.Models;
+using Testing_Reloaded_Server.Models;
 using Testing_Reloaded_Server.Networking;
 
-namespace Testing_Reloaded_Server {
+namespace Testing_Reloaded_Server.UI {
     public partial class StartTestForm : Form {
         private ServerPublishingManager publishManager;
         private TestManager testManager;
@@ -21,18 +15,6 @@ namespace Testing_Reloaded_Server {
 
         protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
-        }
-
-        private void BtnWaitForClients_Click(object sender, EventArgs e) {
-            var test = new ServerTest() {
-                ClientTestPath = txtDataDownloadPath.Text,
-                DeleteFilesAfterEnd = chbDelete.Checked,
-                ReclaimTestImmediately = chbRitira.Checked,
-                TestName = txtTestName.Text,
-                Time = TimeSpan.Parse(chbTime.Text),
-                State = Test.TestState.NotStarted,
-                DocumentationDirectory = txtDocsDir.Text
-            };
         }
 
         private void BtnStartTest_Click(object sender, EventArgs e) {

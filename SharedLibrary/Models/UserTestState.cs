@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Drawing;
 
-namespace SharedLibrary {
+namespace SharedLibrary.Models {
     public class UserTestState {
 
         public enum UserState {

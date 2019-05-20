@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using SharedLibrary.Models;
+using Testing_Reloaded_Client.Networking;
 
-namespace Testing_Reloaded_Client {
-    public partial class frmJoinTest : Form {
+namespace Testing_Reloaded_Client.UI {
+    public partial class JoinTestForm : Form {
         ServerManager serverManager = new ServerManager();
 
-        public frmJoinTest() {
+        public JoinTestForm() {
             InitializeComponent();
         }
 
@@ -50,7 +45,7 @@ namespace Testing_Reloaded_Client {
             if (cmbServers.SelectedIndex == -1 || txtName.Text == "" || txtSurname.Text == "")
                 return;
 
-            var mainForm = new frmTest(cmbServers.SelectedItem as Server, new SharedLibrary.User(txtName.Text, txtSurname.Text, Environment.MachineName));
+            var mainForm = new TestForm(cmbServers.SelectedItem as Server, new User(txtName.Text, txtSurname.Text, Environment.MachineName));
             mainForm.Show();
             mainForm.FormClosed += (o, args) => this.Close();
             this.Hide();

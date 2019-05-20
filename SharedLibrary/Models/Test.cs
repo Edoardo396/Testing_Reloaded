@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SharedLibrary {
+namespace SharedLibrary.Models {
     public class Test {
         public enum TestState {
             NotStarted = 0,

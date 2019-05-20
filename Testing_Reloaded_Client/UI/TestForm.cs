@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharedLibrary;
+using SharedLibrary.Models;
+using SharedLibrary.Statics;
+using Testing_Reloaded_Client.Networking;
 
-namespace Testing_Reloaded_Client {
-    public partial class frmTest : Form {
+namespace Testing_Reloaded_Client.UI {
+    public partial class TestForm : Form {
         private TestManager testManager;
 
 
-        public frmTest(Server selectedServer, User me) {
+        public TestForm(Server selectedServer, User me) {
             InitializeComponent();
 
             testManager = new TestManager(selectedServer, me);

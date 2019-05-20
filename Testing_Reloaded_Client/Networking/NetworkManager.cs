@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Net.Sockets;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SharedLibrary.Networking;
+using SharedLibrary.Statics;
 
-namespace Testing_Reloaded_Client {
+namespace Testing_Reloaded_Client.Networking {
     public class NetworkManager {
         private TcpClient tcpConnection;
         private Server currentServer;
@@ -27,12 +25,12 @@ namespace Testing_Reloaded_Client {
 
         public async Task ConnectToServer() {
             tcpConnection = new TcpClient(AddressFamily.InterNetwork);
-            await tcpConnection.ConnectAsync(currentServer.IP, SharedLibrary.Constants.SERVER_PORT); // try catch
+            await tcpConnection.ConnectAsync(currentServer.IP, Constants.SERVER_PORT); // try catch
             Thread.Sleep(1000);
 
             networkStream = tcpConnection.GetStream();
-            netReader = new StreamReader(networkStream, SharedLibrary.Constants.USED_ENCODING);
-            netWriter = new StreamWriter(networkStream, SharedLibrary.Constants.USED_ENCODING);
+            netReader = new StreamReader(networkStream, Constants.USED_ENCODING);
+            netWriter = new StreamWriter(networkStream, Constants.USED_ENCODING);
         }
 
         public async Task WriteLine(string data) {
@@ -52,7 +50,7 @@ namespace Testing_Reloaded_Client {
 
             if (dataInfo["FileType"].ToString() == "nodata") return null;
 
-            return await SharedLibrary.NetworkUtils.ReadNetworkBytes(networkStream, size,
+            return await NetworkUtils.ReadNetworkBytes(networkStream, size,
                 tcpConnection.ReceiveBufferSize);
         }
 

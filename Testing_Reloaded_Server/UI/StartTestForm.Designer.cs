@@ -1,4 +1,4 @@
-﻿namespace Testing_Reloaded_Server
+﻿namespace Testing_Reloaded_Server.UI
 {
     partial class StartTestForm
     {

@@ -1,7 +1,6 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 
-namespace SharedLibrary {
+namespace SharedLibrary.Statics {
     public static class Constants {
         public static int SERVER_PORT = 12345;
         public static int CLIENT_PORT = 12346;

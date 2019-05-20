@@ -8,6 +8,9 @@ using ICSharpCode.SharpZipLib.Zip;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharedLibrary;
+using SharedLibrary.Models;
+using SharedLibrary.Statics;
+using Testing_Reloaded_Client.Networking;
 
 namespace Testing_Reloaded_Client {
     public class TestManager {

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SharedLibrary.Statics;
 
-namespace Testing_Reloaded_Client {
+namespace Testing_Reloaded_Client.Networking {
     public class ServerManager {
 
         private List<Server> foundServers;
@@ -19,12 +19,12 @@ namespace Testing_Reloaded_Client {
 
         public async Task GetServers() {
 
-            var client = new UdpClient(SharedLibrary.Constants.CLIENT_PORT);
+            var client = new UdpClient(Constants.CLIENT_PORT);
             client.Client.ReceiveTimeout = 1000;
 
-            var json = SharedLibrary.Constants.USED_ENCODING.GetBytes(JsonConvert.SerializeObject(new { Action = "discover" }));
+            var json = Constants.USED_ENCODING.GetBytes(JsonConvert.SerializeObject(new { Action = "discover" }));
 
-            client.Send(json, json.Length, new IPEndPoint(IPAddress.Broadcast, SharedLibrary.Constants.SERVER_PORT));
+            client.Send(json, json.Length, new IPEndPoint(IPAddress.Broadcast, Constants.SERVER_PORT));
 
             
 
@@ -33,7 +33,7 @@ namespace Testing_Reloaded_Client {
                 while (true) {
                     var received = await client.ReceiveAsync();
 
-                    var jobj = JObject.Parse(SharedLibrary.Constants.USED_ENCODING.GetString(received.Buffer));
+                    var jobj = JObject.Parse(Constants.USED_ENCODING.GetString(received.Buffer));
 
                     foundServers.Clear();
 

@@ -12,6 +12,9 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharedLibrary;
+using SharedLibrary.Models;
+using SharedLibrary.UI;
+using Testing_Reloaded_Server.Models;
 
 namespace Testing_Reloaded_Server.Networking {
     public class ClientsManager {
@@ -33,7 +36,7 @@ namespace Testing_Reloaded_Server.Networking {
         }
 
         public void Start() {
-            tcpListener = new TcpListener(new IPEndPoint(IPAddress.Any, SharedLibrary.Constants.SERVER_PORT));
+            tcpListener = new TcpListener(new IPEndPoint(IPAddress.Any, SharedLibrary.Statics.Constants.SERVER_PORT));
             clientsThread = new Thread(LoopClients) {Name = "LoopingThread", IsBackground = true };
             clientsThread.Start();
         }
@@ -53,8 +56,8 @@ namespace Testing_Reloaded_Server.Networking {
 
             var stream = client.GetStream();
 
-            var sWriter = new StreamWriter(stream, SharedLibrary.Constants.USED_ENCODING);
-            var sReader = new StreamReader(stream, SharedLibrary.Constants.USED_ENCODING);
+            var sWriter = new StreamWriter(stream, SharedLibrary.Statics.Constants.USED_ENCODING);
+            var sReader = new StreamReader(stream, SharedLibrary.Statics.Constants.USED_ENCODING);
 
             Client connectedClient = null;
 

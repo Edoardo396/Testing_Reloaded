@@ -1,8 +1,7 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using SharedLibrary;
+﻿using System.Net.Sockets;
+using SharedLibrary.Models;
 
-namespace Testing_Reloaded_Server {
+namespace Testing_Reloaded_Server.Models {
     public class Client : User {
         public int Id { get; set; }
         public TcpClient TcpClient { get; set; }
