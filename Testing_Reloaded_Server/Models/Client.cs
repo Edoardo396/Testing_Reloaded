@@ -8,6 +8,7 @@ namespace Testing_Reloaded_Server.Models {
         public UserTestState TestState { get; set; }
         public Client(int id, User user, TcpClient client) : base(user.Name, user.Surname, user.PCHostname) {
             this.TcpClient = client;
+            this.Id = id;
         }
     }
 }

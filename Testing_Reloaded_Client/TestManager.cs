@@ -11,6 +11,7 @@ using SharedLibrary;
 using SharedLibrary.Models;
 using SharedLibrary.Statics;
 using Testing_Reloaded_Client.Networking;
+using static SharedLibrary.Models.UserTestState;
 
 namespace Testing_Reloaded_Client {
     public class TestManager {
@@ -34,19 +35,15 @@ namespace Testing_Reloaded_Client {
 
         private string ReceivedServerMessage(Server s, JObject message) {
             if (message["Action"].ToString() == "UpdateTest") {
-                this.currentTest = (Test)message["Test"].ToObject(typeof(Test));
+                this.currentTest = (Test) message["Test"].ToObject(typeof(Test));
 
                 if (currentTest.State == Test.TestState.OnHold)
-                    this.TestState.State = UserTestState.UserState.OnHold;
+                    this.TestState.State = UserState.OnHold;
 
                 SendStateUpdate();
                 ReloadUI?.Invoke();
                 return null;
             }
-
-            
-
-
 
 
             return null;
@@ -74,7 +71,7 @@ namespace Testing_Reloaded_Client {
             var jsonResponse = JObject.Parse(response);
 
             this.currentTest = JsonConvert.DeserializeObject<Test>(jsonResponse["Test"].ToString());
-            TestState = new UserTestState {RemainingTime = currentTest.Time, State = UserTestState.UserState.Waiting};
+            TestState = new UserTestState {RemainingTime = currentTest.Time, State = UserState.Waiting};
         }
 
         public async Task WaitForTestStart() {
@@ -94,7 +91,8 @@ namespace Testing_Reloaded_Client {
         }
 
         public async Task DownloadTestDocumentation() {
-            TestState.State = UserTestState.UserState.DownloadingDocs;
+            netManager.ProcessMessages = false;
+            TestState.State = UserState.DownloadingDocs;
 
             await SendStateUpdate();
 
@@ -112,12 +110,14 @@ namespace Testing_Reloaded_Client {
 
             var file = await netManager.ReadData();
 
-            if (file == null) return;
+            if (file != null) {
+                Directory.CreateDirectory(Path.Combine(path, "Documentation"));
 
-            Directory.CreateDirectory(Path.Combine(path, "Documentation"));
+                fastZip.ExtractZip(file, Path.Combine(path, "Documentation"), FastZip.Overwrite.Always, null, "",
+                    null, false, true);
 
-            fastZip.ExtractZip(file, Path.Combine(path, "Documentation"), FastZip.Overwrite.Always, null, "",
-                null, false, true);
+                var result = await netManager.ReadLine();
+            }
 
             netManager.StartListeningForMessages();
         }
@@ -138,6 +138,7 @@ namespace Testing_Reloaded_Client {
         }
 
         public async Task Handover() {
+            netManager.ProcessMessages = false;
             await this.SendStateUpdate();
 
             await netManager.WriteLine(JsonConvert.SerializeObject(new {Action = "TestHandover"}));
@@ -159,6 +160,10 @@ namespace Testing_Reloaded_Client {
             if (CurrentTest.DeleteFilesAfterEnd) {
                 Directory.Delete(ResolvedTestPath, true);
             }
+        }
+
+        public void TestRunning() {
+            netManager.ProcessMessages = true;
         }
     }
 }

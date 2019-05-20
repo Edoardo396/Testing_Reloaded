@@ -63,7 +63,7 @@ namespace Testing_Reloaded_Server {
                 if (string.IsNullOrEmpty(currentTest.DocumentationDirectory))
                     return JsonConvert.SerializeObject(new {Status = "OK", FileType = "nodata", Size = 0});
 
-                clientsManager.SendBytes(c, DocumentationZip);
+                clientsManager.SendBytes(c, DocumentationZip).Wait();
 
                 return JsonConvert.SerializeObject(new {Status = "OK"});
             }
@@ -101,7 +101,7 @@ namespace Testing_Reloaded_Server {
 
         public async Task StartTest() {
             currentTest.State = Test.TestState.Started;
-            await clientsManager.SendMessageToClients(JsonConvert.SerializeObject(new {Action = "TestStarted"}), false);
+            await clientsManager.SendMessageToClients(JsonConvert.SerializeObject(new {Action = "TestStarted"}), true);
         }
 
         public async Task SetTestState(Test.TestState state) {

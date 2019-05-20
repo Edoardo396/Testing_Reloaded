@@ -78,9 +78,7 @@ namespace Testing_Reloaded_Server.UI {
             if (testManager.CurrentTest.State == Test.TestState.Started) {
                 await testManager.SetTestState(Test.TestState.OnHold);
                 btnTestPause.Text = "Riavvia Test";
-            }
-
-            if (testManager.CurrentTest.State == Test.TestState.OnHold) {
+            } else if (testManager.CurrentTest.State == Test.TestState.OnHold) {
                 await testManager.SetTestState(Test.TestState.Started);
                 btnTestPause.Text = "Pausa Test";
             }

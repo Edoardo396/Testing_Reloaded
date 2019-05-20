@@ -65,9 +65,11 @@ namespace Testing_Reloaded_Server.Networking {
                 string json = "";
 
                 if (stream.DataAvailable) {
-                    json = sReader.ReadLine();
+                    lock (tcpListener) {
+                        json = sReader.ReadLine();
+                    }
                 } else {
-                   // Thread.Sleep(50);
+                    // Thread.Sleep(50);
                     continue;
                 }
 
@@ -100,19 +102,19 @@ namespace Testing_Reloaded_Server.Networking {
             }
         }
 
-        public void SendBytes(Client client, byte[] bytes) {
+        public async Task SendBytes(Client client, byte[] bytes) {
 
             var stream = client.TcpClient.GetStream();
             var wStream = new StreamWriter(stream);
 
-            wStream.WriteLine(JsonConvert.SerializeObject(new {Status = "OK", FileType = "zip", Size = bytes.Length}));
-            wStream.Flush();
+            await wStream.WriteLineAsync(JsonConvert.SerializeObject(new {Status = "OK", FileType = "zip", Size = bytes.Length}));
+            await wStream.FlushAsync();
 
             foreach (byte b in bytes) {
                 stream.WriteByte(b);
             }
 
-            stream.Flush();
+            await stream.FlushAsync();
         }
 
         public async Task SendMessageToClients(string message, bool blocking = true) {

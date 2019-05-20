@@ -11,7 +11,7 @@ namespace SharedLibrary.Networking {
             while (mStream.Length < bytesToRead) {
                 
                 byte[] buffer = new byte[receiveSize];
-                int bRead = network.Read(buffer, 0, (int)receiveSize);
+                int bRead = network.Read(buffer, 0, bytesToRead - mStream.Length > (int)receiveSize ? (int)receiveSize : (int)(bytesToRead - mStream.Length));
 
                 await mStream.WriteAsync(buffer, 0, bRead);
             }
