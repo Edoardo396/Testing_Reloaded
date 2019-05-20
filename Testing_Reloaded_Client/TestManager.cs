@@ -56,6 +56,8 @@ namespace Testing_Reloaded_Client {
         public async Task WaitForTestStart() {
             if (currentTest.State == Test.TestState.Started) return;
 
+            await SendStateUpdate();
+
             while (true) {
                 string response = await netManager.ReadLine();
 
@@ -65,10 +67,13 @@ namespace Testing_Reloaded_Client {
                 currentTest.State = Test.TestState.Started;
                 break;
             }
+
         }
 
         public async Task DownloadTestDocumentation() {
             TestState.State = UserTestState.UserState.DownloadingDocs;
+
+            await SendStateUpdate();
 
             string path = ResolvePath(currentTest.ClientTestPath);
             if (Directory.Exists(path))

@@ -86,12 +86,7 @@ namespace Testing_Reloaded_Server {
 
             int size = (int) dataInfo["Size"];
 
-            var bytes = new byte[size];
-            var bReader = new BinaryReader(stream, Encoding.Default);
-
-            bytes = bReader.ReadBytes(bytes.Length);
-
-            var memoryStream = new MemoryStream(bytes);
+            var memoryStream = SharedLibrary.NetworkUtils.ReadNetworkBytes(stream, size, c.TcpClient.ReceiveBufferSize).Result;
 
             var fastZip = new FastZip();
 
