@@ -25,15 +25,14 @@ namespace Testing_Reloaded_Server {
 
             int width = lvClients.Width / 5;
 
-            lvClients.Columns.Add(new ColumnHeader("clmId") { Text = "ClientID", Width = width });
+            lvClients.Columns.Add(new ColumnHeader("clmId") {Text = "ClientID", Width = width});
             lvClients.Columns.Add(new ColumnHeader("clmName") {Text = "Nome", Width = width});
             lvClients.Columns.Add(new ColumnHeader("clmPC") {Text = "Computer", Width = width});
             lvClients.Columns.Add(new ColumnHeader("clmTime") {Text = "Tempo", Width = width});
             lvClients.Columns.Add(new ColumnHeader("clmState") {Text = "Stato", Width = width});
 
             this.testManager.ClientStatusUpdated += TestManagerOnClientStatusUpdated;
-
-            await testManager.StartTest();
+            grpClientControls.Enabled = false;
         }
 
         // run as Client's thread
@@ -67,6 +66,12 @@ namespace Testing_Reloaded_Server {
 
             grpClientControls.Enabled = true;
             lblSelectedClient.Text = lvClients.SelectedItems[0].SubItems[1].Text;
+        }
+
+        private async void BtnTestStart_Click(object sender, EventArgs e) {
+            await testManager.StartTest();
+            btnTestStart.Enabled = false;
+            MessageBox.Show("Test avviato", "Test Started", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

@@ -33,22 +33,22 @@ namespace Testing_Reloaded_Server {
                 State = Test.TestState.NotStarted,
                 DocumentationDirectory = txtDocsDir.Text
             };
-
-
-            groupBox1.Enabled = false;
-            groupBox2.Enabled = false;
-            groupBox3.Enabled = false;
-            btnWaitForClients.Enabled = false;
-
-            publishManager = new ServerPublishingManager(test) {AllowClientsOnHold = true};
-            testManager = new TestManager(test);
-
-            lsbConnectedClients.DataSource = testManager.ConnectedClients;
         }
 
-        private async void BtnStartTest_Click(object sender, EventArgs e) {
-            if (testManager == null)
-                BtnWaitForClients_Click(null, null);
+        private void BtnStartTest_Click(object sender, EventArgs e) {
+            var test = new ServerTest() {
+                ClientTestPath = txtDataDownloadPath.Text,
+                DeleteFilesAfterEnd = chbDelete.Checked,
+                ReclaimTestImmediately = chbRitira.Checked,
+                TestName = txtTestName.Text,
+                Time = TimeSpan.Parse(chbTime.Text),
+                State = Test.TestState.NotStarted,
+                DocumentationDirectory = txtDocsDir.Text,
+                HandoverDirectory = txtConsegneDir.Text
+            };
+
+            publishManager = new ServerPublishingManager(test) { AllowClientsOnHold = true };
+            testManager = new TestManager(test);
 
             var testForm = new TestForm(testManager);
             testForm.Closed += (o, args) => this.Close();

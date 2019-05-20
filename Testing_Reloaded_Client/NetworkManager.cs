@@ -44,20 +44,16 @@ namespace Testing_Reloaded_Client {
             return await netReader.ReadLineAsync();
         }
 
-        public async Task<byte[]> ReadData() {
+        public async Task<MemoryStream> ReadData() {
             // get data info
             var strData = await this.ReadLine();
             var dataInfo = JObject.Parse(strData);
             int size = (int) dataInfo["Size"];
 
-            if (size == 0) return null;
+            if (dataInfo["FileType"].ToString() == "nodata") return null;
 
-            var bytes = new byte[size];
-            var bReader = new BinaryReader(networkStream, Encoding.Default);
-
-            bytes = bReader.ReadBytes(bytes.Length);
-
-            return bytes;
+            return await SharedLibrary.NetworkUtils.ReadNetworkBytes(networkStream, size,
+                tcpConnection.ReceiveBufferSize);
         }
 
         public void SendBytes(byte[] bytes) {

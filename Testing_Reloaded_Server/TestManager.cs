@@ -17,6 +17,7 @@ namespace Testing_Reloaded_Server {
         public BindingList<Client> ConnectedClients => clientsManager.Clients;
 
         public delegate void ClientStatusUpdatedDelegate(Client c);
+
         public event ClientStatusUpdatedDelegate ClientStatusUpdated;
 
 
@@ -62,7 +63,6 @@ namespace Testing_Reloaded_Server {
                 clientsManager.SendBytes(c, DocumentationZip);
 
                 return JsonConvert.SerializeObject(new {Status = "OK"});
-               
             }
 
             if (message["Action"].ToString() == "StateUpdate") {
@@ -79,18 +79,19 @@ namespace Testing_Reloaded_Server {
         }
 
         private string GetUserTest(Client c) {
-
             var stream = c.TcpClient.GetStream();
             var sReader = new StreamReader(stream, SharedLibrary.Constants.USED_ENCODING);
             var dataInfo = JObject.Parse(sReader.ReadLine());
 
             int size = (int) dataInfo["Size"];
 
-            var memoryStream = SharedLibrary.NetworkUtils.ReadNetworkBytes(stream, size, c.TcpClient.ReceiveBufferSize).Result;
+            var memoryStream = SharedLibrary.NetworkUtils.ReadNetworkBytes(stream, size, c.TcpClient.ReceiveBufferSize)
+                .Result;
 
             var fastZip = new FastZip();
 
-            fastZip.ExtractZip(memoryStream, Path.Combine(currentTest.DocumentationDirectory, c.ToString()), FastZip.Overwrite.Always, null, null, null, true, true);
+            fastZip.ExtractZip(memoryStream, Path.Combine(currentTest.HandoverDirectory, c.ToString()),
+                FastZip.Overwrite.Always, null, null, null, true, true);
 
             return JsonConvert.SerializeObject(new {Status = "OK"});
         }

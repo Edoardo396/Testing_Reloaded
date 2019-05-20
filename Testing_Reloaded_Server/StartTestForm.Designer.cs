@@ -41,14 +41,12 @@
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.label4 = new System.Windows.Forms.Label();
             this.txtDocsDir = new System.Windows.Forms.TextBox();
-            this.btnWaitForClients = new System.Windows.Forms.Button();
             this.btnStartTest = new System.Windows.Forms.Button();
-            this.lsbConnectedClients = new System.Windows.Forms.ListBox();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.txtConsegneDir = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
-            this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtTestName
@@ -137,9 +135,9 @@
             // 
             // txtDataDownloadPath
             // 
-            this.txtDataDownloadPath.Location = new System.Drawing.Point(129, 23);
+            this.txtDataDownloadPath.Location = new System.Drawing.Point(145, 31);
             this.txtDataDownloadPath.Name = "txtDataDownloadPath";
-            this.txtDataDownloadPath.Size = new System.Drawing.Size(204, 20);
+            this.txtDataDownloadPath.Size = new System.Drawing.Size(217, 20);
             this.txtDataDownloadPath.TabIndex = 1;
             this.txtDataDownloadPath.Tag = "onlybefore";
             this.txtDataDownloadPath.Text = "%USERPROFILE%\\Desktop\\Temporanea\\$test_name_$surname";
@@ -147,7 +145,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 26);
+            this.label3.Location = new System.Drawing.Point(22, 34);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(117, 13);
             this.label3.TabIndex = 0;
@@ -155,19 +153,21 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.label5);
+            this.groupBox3.Controls.Add(this.txtConsegneDir);
             this.groupBox3.Controls.Add(this.label4);
             this.groupBox3.Controls.Add(this.txtDocsDir);
             this.groupBox3.Location = new System.Drawing.Point(12, 259);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(374, 80);
+            this.groupBox3.Size = new System.Drawing.Size(374, 97);
             this.groupBox3.TabIndex = 6;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Documentazione";
+            this.groupBox3.Text = "Percorsi Server";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(6, 32);
+            this.label4.Location = new System.Drawing.Point(6, 55);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(133, 13);
             this.label4.TabIndex = 7;
@@ -175,26 +175,16 @@
             // 
             // txtDocsDir
             // 
-            this.txtDocsDir.Location = new System.Drawing.Point(145, 29);
+            this.txtDocsDir.Location = new System.Drawing.Point(145, 52);
             this.txtDocsDir.Name = "txtDocsDir";
             this.txtDocsDir.Size = new System.Drawing.Size(223, 20);
             this.txtDocsDir.TabIndex = 6;
             this.txtDocsDir.Tag = "onlybefore";
-            this.txtDocsDir.Text = "C:\\Users\\Edo\\Desktop\\Progetti In Corso\\.idea";
-            // 
-            // btnWaitForClients
-            // 
-            this.btnWaitForClients.Location = new System.Drawing.Point(82, 345);
-            this.btnWaitForClients.Name = "btnWaitForClients";
-            this.btnWaitForClients.Size = new System.Drawing.Size(113, 55);
-            this.btnWaitForClients.TabIndex = 7;
-            this.btnWaitForClients.Text = "Attendi clients";
-            this.btnWaitForClients.UseVisualStyleBackColor = true;
-            this.btnWaitForClients.Click += new System.EventHandler(this.BtnWaitForClients_Click);
+            this.txtDocsDir.Text = "C:\\Users\\Edo\\Desktop\\Progetti In Corso\\rtesting_dirs\\Documentazione";
             // 
             // btnStartTest
             // 
-            this.btnStartTest.Location = new System.Drawing.Point(201, 345);
+            this.btnStartTest.Location = new System.Drawing.Point(141, 362);
             this.btnStartTest.Name = "btnStartTest";
             this.btnStartTest.Size = new System.Drawing.Size(113, 55);
             this.btnStartTest.TabIndex = 8;
@@ -202,32 +192,30 @@
             this.btnStartTest.UseVisualStyleBackColor = true;
             this.btnStartTest.Click += new System.EventHandler(this.BtnStartTest_Click);
             // 
-            // lsbConnectedClients
+            // label5
             // 
-            this.lsbConnectedClients.FormattingEnabled = true;
-            this.lsbConnectedClients.Location = new System.Drawing.Point(22, 20);
-            this.lsbConnectedClients.Name = "lsbConnectedClients";
-            this.lsbConnectedClients.Size = new System.Drawing.Size(333, 121);
-            this.lsbConnectedClients.TabIndex = 9;
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(36, 29);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(103, 13);
+            this.label5.TabIndex = 9;
+            this.label5.Text = "Directory Consegne:";
             // 
-            // groupBox4
+            // txtConsegneDir
             // 
-            this.groupBox4.Controls.Add(this.lsbConnectedClients);
-            this.groupBox4.Location = new System.Drawing.Point(12, 406);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(374, 161);
-            this.groupBox4.TabIndex = 10;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Client Connessi";
+            this.txtConsegneDir.Location = new System.Drawing.Point(145, 26);
+            this.txtConsegneDir.Name = "txtConsegneDir";
+            this.txtConsegneDir.Size = new System.Drawing.Size(223, 20);
+            this.txtConsegneDir.TabIndex = 8;
+            this.txtConsegneDir.Tag = "onlybefore";
+            this.txtConsegneDir.Text = "C:\\Users\\Edo\\Desktop\\Progetti In Corso\\rtesting_dirs\\Consegne";
             // 
             // StartTestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(418, 581);
-            this.Controls.Add(this.groupBox4);
+            this.ClientSize = new System.Drawing.Size(418, 439);
             this.Controls.Add(this.btnStartTest);
-            this.Controls.Add(this.btnWaitForClients);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -239,7 +227,6 @@
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
-            this.groupBox4.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -259,10 +246,9 @@
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox txtDocsDir;
-        private System.Windows.Forms.Button btnWaitForClients;
         private System.Windows.Forms.Button btnStartTest;
-        private System.Windows.Forms.ListBox lsbConnectedClients;
-        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox txtConsegneDir;
     }
 }
 

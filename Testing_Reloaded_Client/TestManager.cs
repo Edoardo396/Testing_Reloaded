@@ -67,7 +67,6 @@ namespace Testing_Reloaded_Client {
                 currentTest.State = Test.TestState.Started;
                 break;
             }
-
         }
 
         public async Task DownloadTestDocumentation() {
@@ -87,13 +86,11 @@ namespace Testing_Reloaded_Client {
 
             var fastZip = new FastZip();
 
-            var fileBytes = await netManager.ReadData();
+            var file = await netManager.ReadData();
 
-            if (fileBytes == null) return;
+            if (file == null) return;
 
             Directory.CreateDirectory(Path.Combine(path, "Documentation"));
-
-            var file = new MemoryStream(fileBytes);
 
             fastZip.ExtractZip(file, Path.Combine(path, "Documentation"), FastZip.Overwrite.Always, null, "",
                 null, false, true);
@@ -112,11 +109,9 @@ namespace Testing_Reloaded_Client {
 
             if (TestState.RemainingTime.Seconds == 0)
                 SendStateUpdate();
-
         }
 
         public async Task Handover() {
-
             await this.SendStateUpdate();
 
             await netManager.WriteLine(JsonConvert.SerializeObject(new {Action = "TestHandover"}));
@@ -135,6 +130,9 @@ namespace Testing_Reloaded_Client {
                 throw new Exception("Server returned wrong message");
             }
 
+            if (CurrentTest.DeleteFilesAfterEnd) {
+                Directory.Delete(ResolvedTestPath, true);
+            }
         }
     }
 }

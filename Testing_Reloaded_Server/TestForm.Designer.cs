@@ -30,19 +30,21 @@
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.grpClientControls = new System.Windows.Forms.GroupBox();
+            this.button3 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             this.lblSelectedClient = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.lvClients = new System.Windows.Forms.ListView();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.btnTestStart = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.grpClientControls.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -72,6 +74,24 @@
             this.grpClientControls.TabStop = false;
             this.grpClientControls.Text = "Client";
             // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(146, 223);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(90, 33);
+            this.button3.TabIndex = 12;
+            this.button3.Text = "Pausa";
+            this.button3.UseVisualStyleBackColor = true;
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(14, 223);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(90, 33);
+            this.button2.TabIndex = 11;
+            this.button2.Text = "Ritira";
+            this.button2.UseVisualStyleBackColor = true;
+            // 
             // lblSelectedClient
             // 
             this.lblSelectedClient.AutoSize = true;
@@ -91,7 +111,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(146, 60);
+            this.button1.Location = new System.Drawing.Point(146, 68);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(90, 33);
             this.button1.TabIndex = 8;
@@ -100,7 +120,7 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(27, 73);
+            this.textBox1.Location = new System.Drawing.Point(27, 81);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(113, 20);
             this.textBox1.TabIndex = 7;
@@ -108,7 +128,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(24, 57);
+            this.label2.Location = new System.Drawing.Point(24, 65);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(80, 13);
             this.label2.TabIndex = 6;
@@ -125,26 +145,9 @@
             this.lvClients.UseCompatibleStateImageBehavior = false;
             this.lvClients.SelectedIndexChanged += new System.EventHandler(this.LvClients_SelectedIndexChanged);
             // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(14, 223);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(90, 33);
-            this.button2.TabIndex = 11;
-            this.button2.Text = "Ritira";
-            this.button2.UseVisualStyleBackColor = true;
-            // 
-            // button3
-            // 
-            this.button3.Location = new System.Drawing.Point(146, 223);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(90, 33);
-            this.button3.TabIndex = 12;
-            this.button3.Text = "Pausa";
-            this.button3.UseVisualStyleBackColor = true;
-            // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.btnTestStart);
             this.groupBox2.Location = new System.Drawing.Point(640, 76);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(283, 294);
@@ -172,11 +175,21 @@
             this.label4.TabIndex = 3;
             this.label4.Text = "Test";
             // 
+            // btnTestStart
+            // 
+            this.btnTestStart.Location = new System.Drawing.Point(16, 239);
+            this.btnTestStart.Name = "btnTestStart";
+            this.btnTestStart.Size = new System.Drawing.Size(90, 33);
+            this.btnTestStart.TabIndex = 13;
+            this.btnTestStart.Text = "Avvia Test";
+            this.btnTestStart.UseVisualStyleBackColor = true;
+            this.btnTestStart.Click += new System.EventHandler(this.BtnTestStart_Click);
+            // 
             // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(935, 374);
+            this.ClientSize = new System.Drawing.Size(935, 375);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -186,6 +199,7 @@
             this.groupBox1.ResumeLayout(false);
             this.grpClientControls.ResumeLayout(false);
             this.grpClientControls.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -205,5 +219,6 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button btnTestStart;
     }
 }
