@@ -23,11 +23,23 @@ namespace Testing_Reloaded_Server.Networking {
 
         private void ListenForNewUdpClients() {
             listenClient = new UdpClient(new IPEndPoint(IPAddress.Any, SharedLibrary.Statics.Constants.SERVER_PORT));
+            listenClient.Client.ReceiveTimeout = 2000;
 
             try {
                 while (true) {
                     var ep = new IPEndPoint(IPAddress.Any, SharedLibrary.Statics.Constants.CLIENT_PORT);
-                    var bytes = listenClient.Receive(ref ep);
+
+                    var sendBytes = SharedLibrary.Statics.Constants.USED_ENCODING.GetBytes(JsonConvert.SerializeObject(new { Action = "Report", Hostname = Environment.MachineName }));
+                    listenClient.Send(sendBytes, sendBytes.Length, new IPEndPoint(IPAddress.Broadcast, SharedLibrary.Statics.Constants.CLIENT_PORT));
+
+                    byte[] bytes;
+
+                    try {
+                        bytes = listenClient.Receive(ref ep);
+                    } catch(Exception e) {
+                        continue;
+                    }
+
                     var message = SharedLibrary.Statics.Constants.USED_ENCODING.GetString(bytes);
 
                     if (!AllowClientsOnHold) continue;
