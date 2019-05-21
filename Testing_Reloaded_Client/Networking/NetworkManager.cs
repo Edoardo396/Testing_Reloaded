@@ -19,7 +19,7 @@ namespace Testing_Reloaded_Client.Networking {
 
         private Thread messageThread;
 
-        public bool DontReadFromSocket { get; set; } = false;
+        public bool ListenMessages { get; set; } = false;
         public bool ListeningForMessages => messageThread.ThreadState == ThreadState.Running;
 
         public delegate string ReceivedMessageFromServerDelegate(Server s, JObject message);
@@ -84,7 +84,7 @@ namespace Testing_Reloaded_Client.Networking {
 
         private void MessagePool() {
             while (true) {
-                if (tcpConnection.Available == 0 || DontReadFromSocket) {
+                if (tcpConnection.Available == 0 || !ListenMessages) {
                     Thread.Sleep(500);
                     continue;
                 }

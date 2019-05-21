@@ -71,6 +71,9 @@ namespace Testing_Reloaded_Client.UI {
             await testManager.SendStateUpdate();
 
             testTimer.Start();
+
+            testManager.TestStarted();
+
             ReloadUi();
         }
 

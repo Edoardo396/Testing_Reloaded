@@ -93,6 +93,10 @@ namespace Testing_Reloaded_Client {
             }
         }
 
+        public void TestStarted() {
+            netManager.ListenMessages = true;
+        }
+
         public async Task DownloadTestDocumentation() {
             TestState.State = UserTestState.UserState.DownloadingDocs;
 
