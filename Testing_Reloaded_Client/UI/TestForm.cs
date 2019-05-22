@@ -70,10 +70,9 @@ namespace Testing_Reloaded_Client.UI {
             testManager.TestState.State = UserTestState.UserState.Testing;
             await testManager.SendStateUpdate();
 
-            testManager.TestRunning();
-
             testTimer.Start();
-            
+
+            testManager.TestStarted();
 
             ReloadUi();
         }

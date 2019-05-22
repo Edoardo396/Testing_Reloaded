@@ -19,8 +19,7 @@ namespace Testing_Reloaded_Client.Networking {
 
         public async Task GetServers() {
 
-            var client = new UdpClient(Constants.CLIENT_PORT);
-            client.Client.ReceiveTimeout = 2000;
+            var client = new UdpClient(new IPEndPoint(IPAddress.Any, SharedLibrary.Statics.Constants.CLIENT_PORT));
 
             var json = Constants.USED_ENCODING.GetBytes(JsonConvert.SerializeObject(new { Action = "discover" }));
 

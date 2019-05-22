@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,7 +19,7 @@ namespace Testing_Reloaded_Client.Networking {
 
         private Thread messageThread;
 
-        public bool ProcessMessages { get; set; } = false;
+        public bool ListenMessages { get; set; } = false;
         public bool ListeningForMessages => messageThread.ThreadState == ThreadState.Running;
 
         public delegate string ReceivedMessageFromServerDelegate(Server s, JObject message);
@@ -31,7 +30,7 @@ namespace Testing_Reloaded_Client.Networking {
 
         public NetworkManager(Server server) {
             this.currentServer = server;
-            messageThread = new Thread(MessagePool) {Name = "MessageThread", IsBackground = true};
+            messageThread = new Thread(MessagePool) {Name = "MessageThread", IsBackground =  true};
         }
 
         public async Task ConnectToServer() {
@@ -61,13 +60,8 @@ namespace Testing_Reloaded_Client.Networking {
 
             if (dataInfo["FileType"].ToString() == "nodata") return null;
 
-            MemoryStream stream;
-
-            lock (tcpConnection) {
-                stream = NetworkUtils.ReadNetworkBytes(networkStream, size).Result;
-            }
-
-            return stream;
+            return await NetworkUtils.ReadNetworkBytes(networkStream, size,
+                tcpConnection.ReceiveBufferSize);
         }
 
         public void SendBytes(byte[] bytes) {
@@ -75,26 +69,13 @@ namespace Testing_Reloaded_Client.Networking {
             var wStream = new StreamWriter(stream);
 
             wStream.WriteLine(JsonConvert.SerializeObject(new {Status = "OK", FileType = "zip", Size = bytes.Length}));
-
-            lock (tcpConnection) {
-                wStream.Flush();
-            }
+            wStream.Flush();
 
             foreach (byte b in bytes) {
                 stream.WriteByte(b);
             }
 
-            lock (tcpConnection) {
-                stream.Flush();
-            }
-        }
-
-        public void LockTcpClient(Action action) {
-            lock (tcpConnection) {
-                ProcessMessages = true;
-                action?.Invoke();
-                ProcessMessages = false;
-            }
+            stream.Flush();
         }
 
         public void StartListeningForMessages() {
@@ -103,18 +84,12 @@ namespace Testing_Reloaded_Client.Networking {
 
         private void MessagePool() {
             while (true) {
-                if (tcpConnection.Available == 0 || !ProcessMessages) {
-                    Thread.Sleep(50);
+                if (tcpConnection.Available == 0 || !ListenMessages) {
+                    Thread.Sleep(500);
                     continue;
                 }
 
-
-                string message;
-
-                lock (tcpConnection) {
-                    message = ReadLine().Result;
-                }
-
+                string message = ReadLine().Result;
                 var json = JObject.Parse(message);
 
                 string response = ReceivedMessageFromServer?.Invoke(currentServer, json);
@@ -123,6 +98,7 @@ namespace Testing_Reloaded_Client.Networking {
                     WriteLine(response).Wait();
                 }
             }
+
         }
     }
 }

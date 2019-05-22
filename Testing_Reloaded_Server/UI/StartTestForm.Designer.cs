@@ -39,11 +39,11 @@
             this.txtDataDownloadPath = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.txtConsegneDir = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.txtDocsDir = new System.Windows.Forms.TextBox();
             this.btnStartTest = new System.Windows.Forms.Button();
-            this.label5 = new System.Windows.Forms.Label();
-            this.txtConsegneDir = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -164,34 +164,6 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Percorsi Server";
             // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(6, 55);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(133, 13);
-            this.label4.TabIndex = 7;
-            this.label4.Text = "Directory documentazione:";
-            // 
-            // txtDocsDir
-            // 
-            this.txtDocsDir.Location = new System.Drawing.Point(145, 52);
-            this.txtDocsDir.Name = "txtDocsDir";
-            this.txtDocsDir.Size = new System.Drawing.Size(223, 20);
-            this.txtDocsDir.TabIndex = 6;
-            this.txtDocsDir.Tag = "onlybefore";
-            this.txtDocsDir.Text = "C:\\Users\\Edo\\Desktop\\Progetti In Corso\\rtesting_dirs\\Documentazione";
-            // 
-            // btnStartTest
-            // 
-            this.btnStartTest.Location = new System.Drawing.Point(141, 362);
-            this.btnStartTest.Name = "btnStartTest";
-            this.btnStartTest.Size = new System.Drawing.Size(113, 55);
-            this.btnStartTest.TabIndex = 8;
-            this.btnStartTest.Text = "Avvia Prova";
-            this.btnStartTest.UseVisualStyleBackColor = true;
-            this.btnStartTest.Click += new System.EventHandler(this.BtnStartTest_Click);
-            // 
             // label5
             // 
             this.label5.AutoSize = true;
@@ -208,7 +180,34 @@
             this.txtConsegneDir.Size = new System.Drawing.Size(223, 20);
             this.txtConsegneDir.TabIndex = 8;
             this.txtConsegneDir.Tag = "onlybefore";
-            this.txtConsegneDir.Text = "C:\\Users\\Edo\\Desktop\\Progetti In Corso\\rtesting_dirs\\Consegne";
+            this.txtConsegneDir.Text = "C:\\Users\\M_inf2.quinta\\Desktop\\consegne";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(6, 55);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(133, 13);
+            this.label4.TabIndex = 7;
+            this.label4.Text = "Directory documentazione:";
+            // 
+            // txtDocsDir
+            // 
+            this.txtDocsDir.Location = new System.Drawing.Point(145, 52);
+            this.txtDocsDir.Name = "txtDocsDir";
+            this.txtDocsDir.Size = new System.Drawing.Size(223, 20);
+            this.txtDocsDir.TabIndex = 6;
+            this.txtDocsDir.Tag = "onlybefore";
+            // 
+            // btnStartTest
+            // 
+            this.btnStartTest.Location = new System.Drawing.Point(141, 362);
+            this.btnStartTest.Name = "btnStartTest";
+            this.btnStartTest.Size = new System.Drawing.Size(113, 55);
+            this.btnStartTest.TabIndex = 8;
+            this.btnStartTest.Text = "Avvia Prova";
+            this.btnStartTest.UseVisualStyleBackColor = true;
+            this.btnStartTest.Click += new System.EventHandler(this.BtnStartTest_Click);
             // 
             // StartTestForm
             // 
