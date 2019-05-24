@@ -98,6 +98,17 @@ namespace Testing_Reloaded_Server.Networking {
                     continue;
                 }
 
+                if (data["Action"].ToString() == "Disconnect")
+                {
+                    if(connectedClient.TestState.State != UserTestState.UserState.Finished) {
+                        connectedClient.TestState.State = UserTestState.UserState.Crashed;
+                    }
+
+                    this.ReceivedMessageFromClient?.Invoke(connectedClient, data);
+
+                    break;
+                }
+
                 string response = this.ReceivedMessageFromClient?.Invoke(connectedClient, data);
 
                 if (response != null) {

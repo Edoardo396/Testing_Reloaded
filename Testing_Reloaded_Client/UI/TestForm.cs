@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows.Forms;
 using SharedLibrary;
 using SharedLibrary.Models;
@@ -136,6 +137,14 @@ namespace Testing_Reloaded_Client.UI {
             lblCurrentOperation.Visible = false;
 
             MessageBox.Show("Consegnato, ora si può chiudere RTesting", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            testManager.Disconnect();
+
         }
     }
 }

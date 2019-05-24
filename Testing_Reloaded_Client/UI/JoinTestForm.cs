@@ -15,7 +15,7 @@ namespace Testing_Reloaded_Client.UI {
         protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
            
-            UpdateServerList();
+            // UpdateServerList();
         }
 
 

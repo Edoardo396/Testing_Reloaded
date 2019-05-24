@@ -61,7 +61,7 @@ namespace Testing_Reloaded_Client {
         }
 
         public async Task DownloadTestData() {
-            var packet = new {Action = "GetTestInfo", PacketID = Statics.GenerateRandomPacketId()};
+            var packet = new {Action = "GetTestInfo"};
 
             var str = (JsonConvert.SerializeObject(packet));
 
@@ -90,6 +90,11 @@ namespace Testing_Reloaded_Client {
             }
         }
 
+        public async Task Disconnect()
+        {
+            await netManager.Disconnect();
+        }
+
         public void TestStarted() {
             netManager.ProcessMessages = true;
         }
@@ -98,14 +103,14 @@ namespace Testing_Reloaded_Client {
             netManager.ProcessMessages = false;
             TestState.State = UserState.DownloadingDocs;
 
-            await SendStateUpdate();
+            // await SendStateUpdate();
 
             string path = ResolvePath(currentTest.ClientTestPath);
             if (Directory.Exists(path))
                 Directory.Delete(path, true);
             Directory.CreateDirectory(path);
 
-            var packet = new {Action = "GetTestDocs", PacketID = Statics.GenerateRandomPacketId()};
+            var packet = new {Action = "GetTestDocs"};
 
 
             await netManager.WriteLine(JsonConvert.SerializeObject(packet));
@@ -143,8 +148,7 @@ namespace Testing_Reloaded_Client {
 
         public async Task Handover() {
             netManager.ProcessMessages = false;
-            await this.SendStateUpdate();
-
+            
             await netManager.WriteLine(JsonConvert.SerializeObject(new {Action = "TestHandover"}));
 
             var fastZip = new FastZip();
@@ -164,6 +168,8 @@ namespace Testing_Reloaded_Client {
             if (CurrentTest.DeleteFilesAfterEnd) {
                 Directory.Delete(ResolvedTestPath, true);
             }
+
+            await this.SendStateUpdate();
         }
 
         public void TestRunning() {

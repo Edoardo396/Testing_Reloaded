@@ -205,7 +205,7 @@
             this.testTimer.Interval = 1000;
             this.testTimer.Tick += new System.EventHandler(this.TestTimer_Tick);
             // 
-            // frmTest
+            // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -213,8 +213,9 @@
             this.Controls.Add(this.lblCurrentOperation);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.grbTestInfo);
-            this.Name = "frmTest";
+            this.Name = "TestForm";
             this.Text = "frmTest";
+//            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TestForm_FormClosing);
             this.grbTestInfo.ResumeLayout(false);
             this.grbTestInfo.PerformLayout();
             this.ResumeLayout(false);
