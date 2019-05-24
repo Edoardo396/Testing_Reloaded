@@ -46,6 +46,7 @@
             this.cmbServers.Name = "cmbServers";
             this.cmbServers.Size = new System.Drawing.Size(213, 21);
             this.cmbServers.TabIndex = 0;
+            this.cmbServers.Text = "10.0.0.2";
             // 
             // label1
             // 
@@ -110,7 +111,7 @@
             this.btnRefresh.UseVisualStyleBackColor = true;
             this.btnRefresh.Click += new System.EventHandler(this.BtnUpdateServers_Click);
             // 
-            // frmJoinTest
+            // JoinTestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -123,7 +124,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cmbServers);
-            this.Name = "frmJoinTest";
+            this.Name = "JoinTestForm";
             this.Text = "Impostazioni test";
             this.ResumeLayout(false);
             this.PerformLayout();

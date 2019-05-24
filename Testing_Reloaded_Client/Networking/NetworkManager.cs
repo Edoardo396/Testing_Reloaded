@@ -44,6 +44,7 @@ namespace Testing_Reloaded_Client.Networking {
         }
 
         public async Task WriteLine(string data) {
+            System.Diagnostics.Debug.WriteLine($"Sending {data}");
             await netWriter.WriteLineAsync(data);
             await netWriter.FlushAsync();
         }

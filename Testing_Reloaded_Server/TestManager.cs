@@ -101,12 +101,12 @@ namespace Testing_Reloaded_Server {
 
         public async Task StartTest() {
             currentTest.State = Test.TestState.Started;
-            await clientsManager.SendMessageToClients(JsonConvert.SerializeObject(new {Action = "TestStarted"}), true);
+            await clientsManager.SendMessageToClients(JsonConvert.SerializeObject(new {Action = "TestStarted"}));
         }
 
         public async Task SetTestState(Test.TestState state) {
             currentTest.State = Test.TestState.OnHold;
-            await clientsManager.SendMessageToClients(JsonConvert.SerializeObject(new { Action = "UpdateTest", Test = currentTest }), false);
+            await clientsManager.SendMessageToClients(JsonConvert.SerializeObject(new { Action = "UpdateTest", Test = currentTest }));
         }
     }
 }

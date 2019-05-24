@@ -74,7 +74,12 @@ namespace Testing_Reloaded_Server.Networking {
                 }
 
 
+                System.Diagnostics.Debug.WriteLine($"{Thread.CurrentThread.Name}: Received from " +
+                    $"{((IPEndPoint)client.Client.RemoteEndPoint).Address}:{((IPEndPoint)client.Client.RemoteEndPoint).Port} message {json}");
+                    
                 JObject data = JObject.Parse(json);
+
+
 
                 if (data["Action"].ToString() == "Connect") {
                     int nextId = clients.Count == 0 ? 0 : clients.Max(ob => ob.Id) + 1;
@@ -117,17 +122,12 @@ namespace Testing_Reloaded_Server.Networking {
             await stream.FlushAsync();
         }
 
-        public async Task SendMessageToClients(string message, bool blocking = true) {
+        public async Task SendMessageToClients(string message) {
             foreach (Client client in Clients) {
-                var stream = new StreamWriter(client.TcpClient.GetStream());
+                byte[] bytes = SharedLibrary.Statics.Constants.USED_ENCODING.GetBytes($"{message}\r\n");
 
-                if (blocking) {
-                    await stream.WriteLineAsync(message);
-                    await stream.FlushAsync();
-                } else {
-                    stream.WriteLineAsync(message);
-                    stream.FlushAsync();
-                }
+                await client.TcpClient.GetStream().WriteAsync(bytes, 0, bytes.Length);
+                await client.TcpClient.GetStream().FlushAsync();
             }
         }
     }

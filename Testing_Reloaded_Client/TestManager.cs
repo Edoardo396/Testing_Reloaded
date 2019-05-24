@@ -123,7 +123,7 @@ namespace Testing_Reloaded_Client {
                 var result = await netManager.ReadLine();
             }
 
-            netManager.StartListeningForMessages();
+            // netManager.StartListeningForMessages();
         }
 
         public async Task SendStateUpdate() {
@@ -167,7 +167,7 @@ namespace Testing_Reloaded_Client {
         }
 
         public void TestRunning() {
-            netManager.ProcessMessages = true;
+           // netManager.ProcessMessages = true;
         }
     }
 }
