@@ -91,7 +91,7 @@ namespace Testing_Reloaded_Client {
         }
 
         public void TestStarted() {
-            netManager.ListenMessages = true;
+            netManager.ProcessMessages = true;
         }
 
         public async Task DownloadTestDocumentation() {
