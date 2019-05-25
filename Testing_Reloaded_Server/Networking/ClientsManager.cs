@@ -122,15 +122,18 @@ namespace Testing_Reloaded_Server.Networking {
                         sWriter.WriteLine(response);
                         sWriter.Flush();
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     System.Diagnostics.Debug.WriteLine($"{++errorCount} fatal error with client {connectedClient}: {e.Message}");
-                    if (errorCount > 5) {
+                    if (errorCount > 2) {
                         connectedClient.TestState.State = UserTestState.UserState.Crashed;
                         client.Close();
                         break;
                     }
                 }
             }
+
+            if (connectedClient.TestState.State != UserTestState.UserState.Finished)
+                connectedClient.TestState.State = UserTestState.UserState.Crashed;
         }
 
         public async Task SendBytes(Client client, byte[] bytes) {

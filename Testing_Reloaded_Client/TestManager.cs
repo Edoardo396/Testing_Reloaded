@@ -157,7 +157,7 @@ namespace Testing_Reloaded_Client {
 
             fastZip.CreateZip(stream, ResolvedTestPath, true, null, @"-bin$;-obj$;-Documentation$");
 
-            netManager.SendBytes(stream.ToArray());
+            await netManager.SendBytes(stream.ToArray());
 
             var json = JObject.Parse(await netManager.ReadLine());
 

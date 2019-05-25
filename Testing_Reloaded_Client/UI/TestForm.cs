@@ -129,14 +129,16 @@ namespace Testing_Reloaded_Client.UI {
             }
           
             try {
-                await testManager.Handover();
                 testTimer.Stop();
+                await testManager.Handover();
                 testManager.TestState.State = UserTestState.UserState.Finished;
                 await testManager.SendStateUpdate();
                 MessageBox.Show("Consegnato, ora si può chiudere RTesting", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
             } catch(Exception ex) {
-                MessageBox.Show("La consegna è fallita, riprova oppure richiedi la consegna manuale", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("La consegna è fallita, riprova oppure richiedi la consegna manuale. Il test è stato messo in pausa", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 System.Diagnostics.Debug.WriteLine(ex.Message);
+                testManager.TestState.State = UserTestState.UserState.OnHold;
+                await testManager.SendStateUpdate();
                 return;
             }
 
