@@ -62,14 +62,14 @@ namespace Testing_Reloaded_Client.UI {
 
             string message =
                 $"Il test è iniziato.\r\nLa cartella del test è {testManager.ResolvedTestPath} puoi trovare la documentazione del test nella sottocartella Documentation se è disponibile. Quando consegnerai veraano inviati tutti i file che si trovano nella cartella del test. in bocca al lupo!";
-
-            MessageBox.Show(message, "Test iniziato", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-            System.Diagnostics.Process.Start(testManager.ResolvedTestPath);
+       
+            // System.Diagnostics.Process.Start(testManager.ResolvedTestPath);
 
 
             testManager.TestState.State = UserTestState.UserState.Testing;
             await testManager.SendStateUpdate();
+
+            MessageBox.Show(message, "Test iniziato", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             testTimer.Start();
 
@@ -127,16 +127,23 @@ namespace Testing_Reloaded_Client.UI {
                     "Waiting Closure", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No) {
                 return;
             }
+          
+            try {
+                await testManager.Handover();
+                testTimer.Stop();
+                testManager.TestState.State = UserTestState.UserState.Finished;
+                await testManager.SendStateUpdate();
+                MessageBox.Show("Consegnato, ora si può chiudere RTesting", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            } catch(Exception ex) {
+                MessageBox.Show("La consegna è fallita, riprova oppure richiedi la consegna manuale", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return;
+            }
 
-            testTimer.Stop();
-            testManager.TestState.State = UserTestState.UserState.Finished;
-            await testManager.Handover();
             ReloadUi();
 
             progressBar1.Visible = false;
             lblCurrentOperation.Visible = false;
-
-            MessageBox.Show("Consegnato, ora si può chiudere RTesting", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
 

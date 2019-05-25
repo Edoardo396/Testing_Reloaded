@@ -9,6 +9,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharedLibrary;
@@ -61,59 +62,73 @@ namespace Testing_Reloaded_Server.Networking {
 
             Client connectedClient = null;
 
-            while (client.Connected) {               
+            int errorCount = 0;
+
+            while (client.Connected) {
                 string json = "";
 
-                if (stream.DataAvailable) {
-                    lock (tcpListener) {
-                        json = sReader.ReadLine();
+                try {
+
+                    if (stream.DataAvailable) {
+                        lock (tcpListener) {
+                            json = sReader.ReadLine();
+                        }
+                    } else {
+                        Thread.Sleep(50);
+                        continue;
                     }
-                } else {
-                    // Thread.Sleep(50);
-                    continue;
-                }
 
 
-                System.Diagnostics.Debug.WriteLine($"{Thread.CurrentThread.Name}: Received from " +
-                    $"{((IPEndPoint)client.Client.RemoteEndPoint).Address}:{((IPEndPoint)client.Client.RemoteEndPoint).Port} message {json}");
-                    
-                JObject data = JObject.Parse(json);
+                    System.Diagnostics.Debug.WriteLine($"{Thread.CurrentThread.Name}: Received from " +
+                                                       $"{((IPEndPoint) client.Client.RemoteEndPoint).Address}:{((IPEndPoint) client.Client.RemoteEndPoint).Port} message {json}");
+
+                    JObject data = JObject.Parse(json);
 
 
 
-                if (data["Action"].ToString() == "Connect") {
-                    int nextId = clients.Count == 0 ? 0 : clients.Max(ob => ob.Id) + 1;
+                    if (data["Action"].ToString() == "Connect") {
+                        int nextId = clients.Count == 0 ? 0 : clients.Max(ob => ob.Id) + 1;
 
-                    connectedClient = new Client(nextId, JsonConvert.DeserializeObject<User>(data["User"].ToString()), client) {TestState = new UserTestState() {State = UserTestState.UserState.Connected}};
+                        connectedClient =
+                            new Client(nextId, JsonConvert.DeserializeObject<User>(data["User"].ToString()), client)
+                                {TestState = new UserTestState() {State = UserTestState.UserState.Connected}};
 
-                    Thread.CurrentThread.Name = $"{connectedClient.Surname}Thread";
-                    clients.Add(connectedClient);
-                    sWriter.WriteLine(JsonConvert.SerializeObject(new { Status = "OK" }));
-                    sWriter.Flush();                    
-                }
+                        Thread.CurrentThread.Name = $"{connectedClient.Surname}Thread";
+                        clients.Add(connectedClient);
+                        sWriter.WriteLine(JsonConvert.SerializeObject(new {Status = "OK"}));
+                        sWriter.Flush();
+                    }
 
-                if (connectedClient == null) {
-                    sWriter.WriteLine(JsonConvert.SerializeObject(new {Status = "ERROR", Code = "SYNFIRST", Message = "Client must call Connect first"}));
-                    sWriter.Flush();
-                    continue;
-                }
+                    if (connectedClient == null) {
+                        sWriter.WriteLine(JsonConvert.SerializeObject(new
+                            {Status = "ERROR", Code = "SYNFIRST", Message = "Client must call Connect first"}));
+                        sWriter.Flush();
+                        continue;
+                    }
 
-                if (data["Action"].ToString() == "Disconnect")
-                {
-                    if(connectedClient.TestState.State != UserTestState.UserState.Finished) {
+                    if (data["Action"].ToString() == "Disconnect") {
+                        if (connectedClient.TestState.State != UserTestState.UserState.Finished) {
+                            connectedClient.TestState.State = UserTestState.UserState.Crashed;
+                        }
+
+                        this.ReceivedMessageFromClient?.Invoke(connectedClient, data);
+
+                        break;
+                    }
+
+                    string response = this.ReceivedMessageFromClient?.Invoke(connectedClient, data);
+
+                    if (response != null) {
+                        sWriter.WriteLine(response);
+                        sWriter.Flush();
+                    }
+                } catch (IOException e) {
+                    System.Diagnostics.Debug.WriteLine($"{++errorCount} fatal error with client {connectedClient}: {e.Message}");
+                    if (errorCount > 5) {
                         connectedClient.TestState.State = UserTestState.UserState.Crashed;
+                        client.Close();
+                        break;
                     }
-
-                    this.ReceivedMessageFromClient?.Invoke(connectedClient, data);
-
-                    break;
-                }
-
-                string response = this.ReceivedMessageFromClient?.Invoke(connectedClient, data);
-
-                if (response != null) {
-                    sWriter.WriteLine(response);
-                    sWriter.Flush();
                 }
             }
         }

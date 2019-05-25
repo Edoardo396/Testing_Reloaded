@@ -162,14 +162,13 @@ namespace Testing_Reloaded_Client {
             var json = JObject.Parse(await netManager.ReadLine());
 
             if (json["Status"].ToString() != "OK") {
-                throw new Exception("Server returned wrong message");
+                throw new Exception("Server error");
             }
 
             if (CurrentTest.DeleteFilesAfterEnd) {
                 Directory.Delete(ResolvedTestPath, true);
             }
 
-            await this.SendStateUpdate();
         }
 
         public void TestRunning() {
