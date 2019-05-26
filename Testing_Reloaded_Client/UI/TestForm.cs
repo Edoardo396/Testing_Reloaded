@@ -1,14 +1,14 @@
-﻿using SharedLibrary.Models;
-using SharedLibrary.Statics;
-using System;
+﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows.Forms;
+using SharedLibrary.Models;
+using SharedLibrary.Statics;
 using Testing_Reloaded_Client.Networking;
 
-namespace Testing_Reloaded_Client.UI
-{
+namespace Testing_Reloaded_Client.UI {
     public partial class TestForm : Form {
-        private TestManager testManager;
+        private readonly TestManager testManager;
 
 
         public TestForm(Server selectedServer, User me) {
@@ -19,7 +19,7 @@ namespace Testing_Reloaded_Client.UI
         }
 
         private void ReloadUi() {
-            this.Invoke(new Action(() => {
+            Invoke(new Action(() => {
                 lblTestName.Text = testManager.CurrentTest.TestName;
                 lblTestDuration.Text = testManager.CurrentTest.Time.ToString();
                 lblRemainingTime.Text = testManager.CurrentTest.Time.ToString();
@@ -59,9 +59,9 @@ namespace Testing_Reloaded_Client.UI
             lblCurrentOperation.Visible = false;
             progressBar1.Visible = false;
 
-            string message =
+            var message =
                 $"Il test è iniziato.\r\nLa cartella del test è {testManager.ResolvedTestPath} puoi trovare la documentazione del test nella sottocartella Documentation se è disponibile. Quando consegnerai veraano inviati tutti i file che si trovano nella cartella del test. in bocca al lupo!";
-       
+
             // System.Diagnostics.Process.Start(testManager.ResolvedTestPath);
 
 
@@ -81,13 +81,12 @@ namespace Testing_Reloaded_Client.UI
             testManager.TimeElapsed((uint) (testTimer.Interval / 1000));
             lblRemainingTime.Text = testManager.TestState.RemainingTime.ToString();
 
-            TimeSpan remainingTime = testManager.TestState.RemainingTime;
+            var remainingTime = testManager.TestState.RemainingTime;
 
-            if (Math.Abs(remainingTime.TotalSeconds) < 1) {
+            if (Math.Abs(remainingTime.TotalSeconds) < 1)
                 MessageBox.Show(
                     $"Il tempo è scaduto, hai un minuto per salvare e chiudere tutti i programmi che stanno usando la cartella {testManager.ResolvedTestPath}, dopodichè il file verrà inviato al server e tutte le modifiche andranno inevitabilmente perse",
                     "Tempo Scaduto", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
 
             if (Math.Abs(remainingTime.TotalSeconds + 30.0) < 1) {
                 progressBar1.Visible = true;
@@ -99,7 +98,7 @@ namespace Testing_Reloaded_Client.UI
                     MessageBoxIcon.Exclamation);
 
                 testManager.TestState.State = UserTestState.UserState.Finished;
-                
+
                 await testManager.Handover();
 
                 ReloadUi();
@@ -107,32 +106,33 @@ namespace Testing_Reloaded_Client.UI
                 progressBar1.Visible = false;
                 lblCurrentOperation.Visible = false;
 
-                MessageBox.Show("Consegnato, ora si può chiudere RTesting", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Consegnato, ora si può chiudere RTesting", "Done", MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
             }
         }
 
         private void BtnOpenTestDir_Click(object sender, EventArgs e) {
-            System.Diagnostics.Process.Start(testManager.ResolvedTestPath);
+            Process.Start(testManager.ResolvedTestPath);
         }
 
         private async void BtnConsegna_Click(object sender, EventArgs e) {
-
             progressBar1.Visible = true;
             lblCurrentOperation.Visible = true;
             lblCurrentOperation.Text = "Consegna in corso";
 
             if (MessageBox.Show(
                     $"ATTENZIONE: SALVARE E CHIUDERE TUTTI I PROGRAMMI CHE STANNO USANDO LA DIRECTORY {testManager.ResolvedTestPath} ALTREMENTI LE MODIFICHE NON VERRANNO SALVATE. PREMERE OK PER CONTINUARE. VUOI CONTINUARE?",
-                    "Waiting Closure", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No) {
+                    "Waiting Closure", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
                 return;
-            }
-          
+
             try {
                 testTimer.Stop();
                 await testManager.Handover();
-            } catch(Exception ex) {
-                MessageBox.Show("La consegna è fallita, riprova oppure richiedi la consegna manuale. Il test è stato messo in pausa", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                System.Diagnostics.Debug.WriteLine(ex.Message);
+            } catch (Exception ex) {
+                MessageBox.Show(
+                    "La consegna è fallita, riprova oppure richiedi la consegna manuale. Il test è stato messo in pausa",
+                    "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Debug.WriteLine(ex.Message);
                 testManager.TestState.State = UserTestState.UserState.OnHold;
                 await testManager.SendStateUpdate();
                 return;
@@ -145,16 +145,14 @@ namespace Testing_Reloaded_Client.UI
 
             testManager.TestState.State = UserTestState.UserState.Finished;
             await testManager.SendStateUpdate();
-            MessageBox.Show("Consegnato, ora si può chiudere RTesting", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
+            MessageBox.Show("Consegnato, ora si può chiudere RTesting", "Done", MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
         }
 
 
-        protected override void OnClosing(CancelEventArgs e)
-        {
+        protected override void OnClosing(CancelEventArgs e) {
             base.OnClosing(e);
             testManager.Disconnect();
-
         }
     }
 }
