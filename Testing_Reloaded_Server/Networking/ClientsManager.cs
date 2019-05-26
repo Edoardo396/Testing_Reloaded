@@ -54,10 +54,12 @@ namespace Testing_Reloaded_Server.Networking {
 
         private void HandleClient(object o) {
             TcpClient client = (TcpClient) o;
+            
+            TcpClient messageClient = new TcpClient();
 
             var stream = client.GetStream();
 
-            var sWriter = new StreamWriter(stream, SharedLibrary.Statics.Constants.USED_ENCODING);
+            var sWriter = new StreamWriter(stream, SharedLibrary.Statics.Constants.USED_ENCODING) {AutoFlush = true};
             var sReader = new StreamReader(stream, SharedLibrary.Statics.Constants.USED_ENCODING);
 
             Client connectedClient = null;
@@ -84,8 +86,6 @@ namespace Testing_Reloaded_Server.Networking {
 
                     JObject data = JObject.Parse(json);
 
-
-
                     if (data["Action"].ToString() == "Connect") {
                         int nextId = clients.Count == 0 ? 0 : clients.Max(ob => ob.Id) + 1;
 
@@ -95,8 +95,19 @@ namespace Testing_Reloaded_Server.Networking {
 
                         Thread.CurrentThread.Name = $"{connectedClient.Surname}Thread";
                         clients.Add(connectedClient);
+
+                        int messagePort = (int)data["MessagePort"];
+
+                        try {
+                            messageClient.Connect(connectedClient.IP, messagePort);
+                        } catch (SocketException ex) {
+                            sWriter.WriteLine(JsonConvert.SerializeObject(new {
+                                Status = "ERROR", ErrorCode = "MCNOP", Message = "Could not open message connection"
+                            }));
+                        }
+
                         sWriter.WriteLine(JsonConvert.SerializeObject(new {Status = "OK"}));
-                        sWriter.Flush();
+
                     }
 
                     if (connectedClient == null) {

@@ -55,9 +55,7 @@ namespace Testing_Reloaded_Client {
         }
 
         public async Task Connect() {
-            await netManager.ConnectToServer();
-            await netManager.WriteLine(JsonConvert.SerializeObject(new {Action = "Connect", User = me}));
-            await netManager.ReadLine();
+            await netManager.ConnectToServer(me);
         }
 
         public async Task DownloadTestData() {
