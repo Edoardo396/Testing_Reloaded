@@ -6,7 +6,7 @@ using Testing_Reloaded_Client.Networking;
 
 namespace Testing_Reloaded_Client.UI {
     public partial class JoinTestForm : Form {
-        ServerManager serverManager = new ServerManager();
+        private readonly ServerManager serverManager = new ServerManager();
 
         public JoinTestForm() {
             InitializeComponent();
@@ -14,7 +14,7 @@ namespace Testing_Reloaded_Client.UI {
 
         protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
-           
+
             // UpdateServerList();
         }
 
@@ -45,22 +45,17 @@ namespace Testing_Reloaded_Client.UI {
         private void btnJoin_Click(object sender, EventArgs e) {
             Server server = null;
 
-            if ((cmbServers.SelectedIndex == -1 && cmbServers.Text == "" )|| txtName.Text == "" || txtSurname.Text == "")
+            if (cmbServers.SelectedIndex == -1 && cmbServers.Text == "" || txtName.Text == "" || txtSurname.Text == "")
                 return;
 
-            if (IPAddress.TryParse(cmbServers.Text, out IPAddress address)) {
-                server = new Server() {IP = address};
-            }
+            if (IPAddress.TryParse(cmbServers.Text, out var address)) server = new Server {IP = address};
 
-            if (cmbServers.SelectedIndex != -1) {
-                server = cmbServers.SelectedItem as Server;
-            }
+            if (cmbServers.SelectedIndex != -1) server = cmbServers.SelectedItem as Server;
 
             var mainForm = new TestForm(server, new User(txtName.Text, txtSurname.Text, Environment.MachineName));
             mainForm.Show();
-            mainForm.FormClosed += (o, args) => this.Close();
-            this.Hide();
-
+            mainForm.FormClosed += (o, args) => Close();
+            Hide();
         }
     }
 }

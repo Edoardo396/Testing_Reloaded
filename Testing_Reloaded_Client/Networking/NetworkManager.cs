@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
@@ -7,32 +7,33 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharedLibrary.Networking;
 using SharedLibrary.Statics;
+using ThreadState = System.Threading.ThreadState;
 
 namespace Testing_Reloaded_Client.Networking {
     public class NetworkManager {
-        private TcpClient tcpConnection;
-        private Server currentServer;
+        public delegate string ReceivedMessageFromServerDelegate(Server s, JObject message);
+
+        private readonly Server currentServer;
+
+        private readonly Thread messageThread;
+        private StreamReader netReader;
 
 
         private NetworkStream networkStream;
-        private StreamReader netReader;
         private StreamWriter netWriter;
+        private TcpClient tcpConnection;
 
-        private Thread messageThread;
+        public NetworkManager(Server server) {
+            currentServer = server;
+            messageThread = new Thread(MessagePool) {Name = "MessageThread", IsBackground = true};
+        }
 
         public bool ProcessMessages { get; set; } = false;
         public bool ListeningForMessages => messageThread.ThreadState == ThreadState.Running;
 
-        public delegate string ReceivedMessageFromServerDelegate(Server s, JObject message);
-
-        public event ReceivedMessageFromServerDelegate ReceivedMessageFromServer;
-
         public bool Connected => netReader != null && tcpConnection.Connected;
 
-        public NetworkManager(Server server) {
-            this.currentServer = server;
-            messageThread = new Thread(MessagePool) {Name = "MessageThread", IsBackground =  true};
-        }
+        public event ReceivedMessageFromServerDelegate ReceivedMessageFromServer;
 
         public async Task ConnectToServer() {
             tcpConnection = new TcpClient(AddressFamily.InterNetwork);
@@ -45,7 +46,7 @@ namespace Testing_Reloaded_Client.Networking {
         }
 
         public async Task WriteLine(string data) {
-            System.Diagnostics.Debug.WriteLine($"Sending {data}");
+            Debug.WriteLine($"Sending {data}");
             await netWriter.WriteLineAsync(data);
             await netWriter.FlushAsync();
         }
@@ -56,9 +57,9 @@ namespace Testing_Reloaded_Client.Networking {
 
         public async Task<MemoryStream> ReadData() {
             // get data info
-            var strData = await this.ReadLine();
+            var strData = await ReadLine();
             var dataInfo = JObject.Parse(strData);
-            int size = (int) dataInfo["Size"];
+            var size = (int) dataInfo["Size"];
 
             if (dataInfo["FileType"].ToString() == "nodata") return null;
 
@@ -70,16 +71,18 @@ namespace Testing_Reloaded_Client.Networking {
             var stream = tcpConnection.GetStream();
             var wStream = new StreamWriter(stream);
 
-            await wStream.WriteLineAsync(JsonConvert.SerializeObject(new {Status = "OK", FileType = "zip", Size = bytes.Length}));
+            await wStream.WriteLineAsync(JsonConvert.SerializeObject(new
+                {Status = "OK", FileType = "zip", Size = bytes.Length}));
             await wStream.FlushAsync();
 
             long sent = 0;
 
-            while(sent < bytes.Length) {
+            while (sent < bytes.Length) {
+                var toSend = bytes.Length - sent < tcpConnection.SendBufferSize
+                    ? bytes.Length - sent
+                    : tcpConnection.SendBufferSize;
 
-                long toSend = (bytes.Length - sent) < tcpConnection.SendBufferSize ? (bytes.Length - sent) : tcpConnection.SendBufferSize;
-
-                await stream.WriteAsync(bytes, (int)sent, (int)toSend);
+                await stream.WriteAsync(bytes, (int) sent, (int) toSend);
                 sent += toSend;
 
                 await stream.FlushAsync();
@@ -97,21 +100,17 @@ namespace Testing_Reloaded_Client.Networking {
                     continue;
                 }
 
-                string message = ReadLine().Result;
+                var message = ReadLine().Result;
                 var json = JObject.Parse(message);
 
-                string response = ReceivedMessageFromServer?.Invoke(currentServer, json);
+                var response = ReceivedMessageFromServer?.Invoke(currentServer, json);
 
-                if (response != null) {
-                    WriteLine(response).Wait();
-                }
+                if (response != null) WriteLine(response).Wait();
             }
-
         }
 
-        public async Task Disconnect()
-        {
-            await WriteLine(JsonConvert.SerializeObject(new { Action = "Disconnect" }));
+        public async Task Disconnect() {
+            await WriteLine(JsonConvert.SerializeObject(new {Action = "Disconnect"}));
             tcpConnection.Close();
         }
     }

@@ -15,6 +15,5 @@ namespace SharedLibrary.Models {
         public bool ReclaimTestImmediately { get; set; }
         public bool DeleteFilesAfterEnd { get; set; }
         public TestState State { get; set; }
-
     }
 }

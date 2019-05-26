@@ -2,7 +2,6 @@
 
 namespace SharedLibrary.Models {
     public class UserTestState {
-
         public enum UserState {
             Connected = 0,
             Waiting = 1,
@@ -13,7 +12,6 @@ namespace SharedLibrary.Models {
             Crashed = 6
         }
 
-       
 
         public TimeSpan RemainingTime { get; set; }
         public UserState State { get; set; }

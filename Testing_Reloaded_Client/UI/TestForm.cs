@@ -1,12 +1,12 @@
-﻿using System;
+﻿using SharedLibrary.Models;
+using SharedLibrary.Statics;
+using System;
 using System.ComponentModel;
 using System.Windows.Forms;
-using SharedLibrary;
-using SharedLibrary.Models;
-using SharedLibrary.Statics;
 using Testing_Reloaded_Client.Networking;
 
-namespace Testing_Reloaded_Client.UI {
+namespace Testing_Reloaded_Client.UI
+{
     public partial class TestForm : Form {
         private TestManager testManager;
 
@@ -33,7 +33,6 @@ namespace Testing_Reloaded_Client.UI {
                 btnConsegna.Enabled = testManager.TestState.State == UserTestState.UserState.Testing;
             }));
         }
-
 
         protected override async void OnLoad(EventArgs e) {
             base.OnLoad(e);

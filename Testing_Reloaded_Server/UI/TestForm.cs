@@ -6,14 +6,13 @@ using Testing_Reloaded_Server.Models;
 using Testing_Reloaded_Server.Networking;
 
 namespace Testing_Reloaded_Server.UI {
-    public partial class TestForm : Form {
-
+    public class TestForm : Form {
         private ServerPublishingManager publishingManager;
-        private TestManager testManager;
+        private readonly TestManager testManager;
 
         public TestForm(TestManager manager) {
             InitializeComponent();
-            this.testManager = manager;
+            testManager = manager;
         }
 
         protected override async void OnLoad(EventArgs e) {
@@ -23,7 +22,7 @@ namespace Testing_Reloaded_Server.UI {
 
             lvClients.View = View.Details;
 
-            int width = lvClients.Width / 5;
+            var width = lvClients.Width / 5;
 
             lvClients.Columns.Add(new ColumnHeader("clmId") {Text = "ClientID", Width = width});
             lvClients.Columns.Add(new ColumnHeader("clmName") {Text = "Nome", Width = width});
@@ -31,7 +30,7 @@ namespace Testing_Reloaded_Server.UI {
             lvClients.Columns.Add(new ColumnHeader("clmTime") {Text = "Tempo", Width = width});
             lvClients.Columns.Add(new ColumnHeader("clmState") {Text = "Stato", Width = width});
 
-            this.testManager.ClientStatusUpdated += TestManagerOnClientStatusUpdated;
+            testManager.ClientStatusUpdated += TestManagerOnClientStatusUpdated;
             grpClientControls.Enabled = false;
         }
 
@@ -39,11 +38,11 @@ namespace Testing_Reloaded_Server.UI {
         private void TestManagerOnClientStatusUpdated(Client c) {
             lvClients.Invoke(new Action(() => {
                 lvClients.Items.Clear();
-                foreach (Client client in testManager.ConnectedClients) {
+                foreach (var client in testManager.ConnectedClients) {
                     var item = new ListViewItem(client.Id.ToString());
 
-                    string state = client.TestState?.State.ToString();
-                    string rtime = client.TestState?.RemainingTime.ToString();
+                    var state = client.TestState?.State.ToString();
+                    var rtime = client.TestState?.RemainingTime.ToString();
 
                     item.SubItems.Add(client.ToString());
                     item.SubItems.Add(client.PCHostname);

@@ -1,12 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 using SharedLibrary.Models;
 using Testing_Reloaded_Server.Models;
-using System.IO;
-using Testing_Reloaded_Server.Networking;
 
 namespace Testing_Reloaded_Server.UI {
-    public partial class StartTestForm : Form {
+    public class StartTestForm : Form {
         private TestManager testManager;
 
         public StartTestForm() {
@@ -18,11 +17,9 @@ namespace Testing_Reloaded_Server.UI {
         }
 
         private void BtnStartTest_Click(object sender, EventArgs e) {
-            if(txtDocsDir.Text != "" && !Directory.Exists(txtDocsDir.Text)) {
-                return;
-            }
+            if (txtDocsDir.Text != "" && !Directory.Exists(txtDocsDir.Text)) return;
 
-            var test = new ServerTest() {
+            var test = new ServerTest {
                 ClientTestPath = txtDataDownloadPath.Text,
                 DeleteFilesAfterEnd = chbDelete.Checked,
                 ReclaimTestImmediately = chbRitira.Checked,
@@ -36,10 +33,10 @@ namespace Testing_Reloaded_Server.UI {
             testManager = new TestManager(test);
 
             var testForm = new TestForm(testManager);
-            testForm.Closed += (o, args) => this.Close();
+            testForm.Closed += (o, args) => Close();
 
             testForm.Show();
-            this.Hide();
+            Hide();
         }
     }
 }

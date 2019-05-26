@@ -4,10 +4,8 @@ using SharedLibrary.Models;
 
 namespace SharedLibrary.Statics {
     public static class Extensions {
-        public static Color UserStateToColor(this UserTestState.UserState s)
-        {
-            switch (s)
-            {
+        public static Color UserStateToColor(this UserTestState.UserState s) {
+            switch (s) {
                 case UserTestState.UserState.Connected:
                     return Color.LightGreen;
                     break;
@@ -33,8 +31,7 @@ namespace SharedLibrary.Statics {
             }
         }
 
-        public static Color TestStateToColor(this Test.TestState s)
-        {
+        public static Color TestStateToColor(this Test.TestState s) {
             switch (s) {
                 case Test.TestState.NotStarted:
                     return Color.Red;

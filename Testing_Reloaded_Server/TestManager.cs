@@ -1,32 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SharedLibrary;
 using SharedLibrary.Models;
+using SharedLibrary.Networking;
+using SharedLibrary.Statics;
 using Testing_Reloaded_Server.Models;
 using Testing_Reloaded_Server.Networking;
 
 namespace Testing_Reloaded_Server {
     public class TestManager {
-        private ServerTest currentTest;
-        private ClientsManager clientsManager;
-
-        public BindingList<Client> ConnectedClients => clientsManager.Clients;
-        public Test CurrentTest => currentTest;
-
-        public delegate void ClientStatusUpdatedDelegate(Client c);
-
-        public event ClientStatusUpdatedDelegate ClientStatusUpdated;
+        private readonly ClientsManager clientsManager;
+        private readonly ServerTest currentTest;
 
 
         private byte[] documentationZip;
+
+
+        public TestManager(ServerTest test) {
+            currentTest = test;
+            clientsManager = new ClientsManager();
+            clientsManager.ReceivedMessageFromClient += ClientsManagerOnReceivedMessageFromClient;
+
+            clientsManager.Start();
+        }
+
+        public BindingList<Client> ConnectedClients => clientsManager.Clients;
+        public Test CurrentTest => currentTest;
 
         private byte[] DocumentationZip {
             get {
@@ -41,19 +44,11 @@ namespace Testing_Reloaded_Server {
             }
         }
 
-
-        public TestManager(ServerTest test) {
-            this.currentTest = test;
-            clientsManager = new ClientsManager();
-            clientsManager.ReceivedMessageFromClient += ClientsManagerOnReceivedMessageFromClient;
-
-            clientsManager.Start();
-        }
+        public event ClientStatusUpdatedDelegate ClientStatusUpdated;
 
         private string ClientsManagerOnReceivedMessageFromClient(Client c, JObject message) {
-            if (message["Action"].ToString() == "GetTestInfo") {
+            if (message["Action"].ToString() == "GetTestInfo")
                 return JsonConvert.SerializeObject(new {Status = "OK", Test = currentTest as Test});
-            }
 
             if (message["Action"].ToString() == "GetTestDocs") {
                 if (currentTest.State == Test.TestState.NotStarted)
@@ -70,13 +65,10 @@ namespace Testing_Reloaded_Server {
                 return JsonConvert.SerializeObject(new {Status = "OK"});
             }
 
-            if (message["Action"].ToString() == "StateUpdate") {
+            if (message["Action"].ToString() == "StateUpdate")
                 c.TestState = JsonConvert.DeserializeObject<UserTestState>(message["State"].ToString());
-            }
 
-            if (message["Action"].ToString() == "TestHandover") {
-                return GetUserTest(c);
-            }
+            if (message["Action"].ToString() == "TestHandover") return GetUserTest(c);
 
             ClientStatusUpdated?.Invoke(c);
 
@@ -85,10 +77,10 @@ namespace Testing_Reloaded_Server {
 
         private string GetUserTest(Client c) {
             var stream = c.TcpClient.GetStream();
-            var sReader = new StreamReader(stream, SharedLibrary.Statics.Constants.USED_ENCODING);
+            var sReader = new StreamReader(stream, Constants.USED_ENCODING);
             var dataInfo = JObject.Parse(sReader.ReadLine());
 
-            int size = (int) dataInfo["Size"];
+            var size = (int) dataInfo["Size"];
 
 
             stream.ReadTimeout = 5000;
@@ -96,7 +88,7 @@ namespace Testing_Reloaded_Server {
             MemoryStream memoryStream = null;
 
             try {
-                memoryStream = SharedLibrary.Networking.NetworkUtils
+                memoryStream = NetworkUtils
                     .ReadNetworkBytes(stream, size, c.TcpClient.ReceiveBufferSize)
                     .Result;
 
@@ -105,14 +97,10 @@ namespace Testing_Reloaded_Server {
                 fastZip.ExtractZip(memoryStream, Path.Combine(currentTest.HandoverDirectory, c.ToString()),
                     FastZip.Overwrite.Always, null, null, null, true, true);
 
-                return JsonConvert.SerializeObject(new { Status = "OK" });
+                return JsonConvert.SerializeObject(new {Status = "OK"});
             } catch (Exception e) {
-
-                return JsonConvert.SerializeObject(new { Status = "Error", ErrorCode = "HNDFAIL", Message = e.Message });
-
+                return JsonConvert.SerializeObject(new {Status = "Error", ErrorCode = "HNDFAIL", e.Message});
             }
-
-           
         }
 
         public async Task StartTest() {
@@ -122,7 +110,10 @@ namespace Testing_Reloaded_Server {
 
         public async Task SetTestState(Test.TestState state) {
             currentTest.State = Test.TestState.OnHold;
-            await clientsManager.SendMessageToClients(JsonConvert.SerializeObject(new { Action = "UpdateTest", Test = currentTest }));
+            await clientsManager.SendMessageToClients(JsonConvert.SerializeObject(new
+                {Action = "UpdateTest", Test = currentTest}));
         }
+
+        public delegate void ClientStatusUpdatedDelegate(Client c);
     }
 }
