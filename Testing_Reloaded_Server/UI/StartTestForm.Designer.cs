@@ -56,7 +56,7 @@
             this.txtTestName.Size = new System.Drawing.Size(252, 20);
             this.txtTestName.TabIndex = 0;
             this.txtTestName.Tag = "onlybefore";
-            this.txtTestName.Text = "ASP";
+            this.txtTestName.Text = "SuperTest";
             // 
             // label1
             // 
@@ -83,7 +83,7 @@
             this.chbTime.Size = new System.Drawing.Size(252, 20);
             this.chbTime.TabIndex = 2;
             this.chbTime.Tag = "onlybefore";
-            this.chbTime.Text = "00:00:30";
+            this.chbTime.Text = "00:02:00";
             // 
             // groupBox1
             // 
@@ -180,7 +180,7 @@
             this.txtConsegneDir.Size = new System.Drawing.Size(223, 20);
             this.txtConsegneDir.TabIndex = 8;
             this.txtConsegneDir.Tag = "onlybefore";
-            this.txtConsegneDir.Text = "C:\\Users\\M_inf2.quinta\\Desktop\\consegne";
+            this.txtConsegneDir.Text = "C:\\Users\\edoar\\Desktop\\Progetti\\Test_RT\\consegne";
             // 
             // label4
             // 
@@ -198,6 +198,7 @@
             this.txtDocsDir.Size = new System.Drawing.Size(223, 20);
             this.txtDocsDir.TabIndex = 6;
             this.txtDocsDir.Tag = "onlybefore";
+            this.txtDocsDir.Text = "C:\\Users\\edoar\\Desktop\\Progetti\\Test_RT\\docs";
             // 
             // btnStartTest
             // 

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,6 +45,7 @@ namespace Testing_Reloaded_Client.Networking {
         }
 
         public async Task WriteLine(string data) {
+            System.Diagnostics.Debug.WriteLine($"Sending {data}");
             await netWriter.WriteLineAsync(data);
             await netWriter.FlushAsync();
         }
@@ -64,18 +66,24 @@ namespace Testing_Reloaded_Client.Networking {
                 tcpConnection.ReceiveBufferSize);
         }
 
-        public void SendBytes(byte[] bytes) {
+        public async Task SendBytes(byte[] bytes) {
             var stream = tcpConnection.GetStream();
             var wStream = new StreamWriter(stream);
 
-            wStream.WriteLine(JsonConvert.SerializeObject(new {Status = "OK", FileType = "zip", Size = bytes.Length}));
-            wStream.Flush();
+            await wStream.WriteLineAsync(JsonConvert.SerializeObject(new {Status = "OK", FileType = "zip", Size = bytes.Length}));
+            await wStream.FlushAsync();
 
-            foreach (byte b in bytes) {
-                stream.WriteByte(b);
+            long sent = 0;
+
+            while(sent < bytes.Length) {
+
+                long toSend = (bytes.Length - sent) < tcpConnection.SendBufferSize ? (bytes.Length - sent) : tcpConnection.SendBufferSize;
+
+                await stream.WriteAsync(bytes, (int)sent, (int)toSend);
+                sent += toSend;
+
+                await stream.FlushAsync();
             }
-
-            stream.Flush();
         }
 
         public void StartListeningForMessages() {
@@ -99,6 +107,12 @@ namespace Testing_Reloaded_Client.Networking {
                 }
             }
 
+        }
+
+        public async Task Disconnect()
+        {
+            await WriteLine(JsonConvert.SerializeObject(new { Action = "Disconnect" }));
+            tcpConnection.Close();
         }
     }
 }

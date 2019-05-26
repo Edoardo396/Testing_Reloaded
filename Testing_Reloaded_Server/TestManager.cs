@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip;
@@ -88,25 +90,39 @@ namespace Testing_Reloaded_Server {
 
             int size = (int) dataInfo["Size"];
 
-            var memoryStream = SharedLibrary.Networking.NetworkUtils.ReadNetworkBytes(stream, size, c.TcpClient.ReceiveBufferSize)
-                .Result;
 
-            var fastZip = new FastZip();
+            stream.ReadTimeout = 5000;
 
-            fastZip.ExtractZip(memoryStream, Path.Combine(currentTest.HandoverDirectory, c.ToString()),
-                FastZip.Overwrite.Always, null, null, null, true, true);
+            MemoryStream memoryStream = null;
 
-            return JsonConvert.SerializeObject(new {Status = "OK"});
+            try {
+                memoryStream = SharedLibrary.Networking.NetworkUtils
+                    .ReadNetworkBytes(stream, size, c.TcpClient.ReceiveBufferSize)
+                    .Result;
+
+                var fastZip = new FastZip();
+
+                fastZip.ExtractZip(memoryStream, Path.Combine(currentTest.HandoverDirectory, c.ToString()),
+                    FastZip.Overwrite.Always, null, null, null, true, true);
+
+                return JsonConvert.SerializeObject(new { Status = "OK" });
+            } catch (Exception e) {
+
+                return JsonConvert.SerializeObject(new { Status = "Error", ErrorCode = "HNDFAIL", Message = e.Message });
+
+            }
+
+           
         }
 
         public async Task StartTest() {
             currentTest.State = Test.TestState.Started;
-            await clientsManager.SendMessageToClients(JsonConvert.SerializeObject(new {Action = "TestStarted"}), true);
+            await clientsManager.SendMessageToClients(JsonConvert.SerializeObject(new {Action = "TestStarted"}));
         }
 
         public async Task SetTestState(Test.TestState state) {
             currentTest.State = Test.TestState.OnHold;
-            await clientsManager.SendMessageToClients(JsonConvert.SerializeObject(new { Action = "UpdateTest", Test = currentTest }), false);
+            await clientsManager.SendMessageToClients(JsonConvert.SerializeObject(new { Action = "UpdateTest", Test = currentTest }));
         }
     }
 }

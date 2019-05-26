@@ -19,11 +19,11 @@ namespace Testing_Reloaded_Client.Networking {
 
         public async Task GetServers() {
 
-            var client = new UdpClient(new IPEndPoint(IPAddress.Any, SharedLibrary.Statics.Constants.CLIENT_PORT));
+            var client = new UdpClient(new IPEndPoint(IPAddress.Any, SharedLibrary.Statics.Constants.BROADCAST_PORT_CLIENT));
 
             var json = Constants.USED_ENCODING.GetBytes(JsonConvert.SerializeObject(new { Action = "discover" }));
 
-            client.Send(json, json.Length, new IPEndPoint(IPAddress.Broadcast, Constants.SERVER_PORT));
+            client.Send(json, json.Length, new IPEndPoint(IPAddress.Broadcast, Constants.BROADCAST_PORT_SERVER));
 
             
 

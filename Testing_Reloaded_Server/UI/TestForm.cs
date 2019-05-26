@@ -19,7 +19,7 @@ namespace Testing_Reloaded_Server.UI {
         protected override async void OnLoad(EventArgs e) {
             base.OnLoad(e);
 
-            publishingManager = new ServerPublishingManager(testManager.CurrentTest) {AllowClientsOnHold = true};
+            // publishingManager = new ServerPublishingManager(testManager.CurrentTest) {AllowClientsOnHold = true};
 
             lvClients.View = View.Details;
 

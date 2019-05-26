@@ -3,6 +3,8 @@ using SharedLibrary.Models;
 
 namespace Testing_Reloaded_Server.Models {
     public class Client : User {
+
+
         public int Id { get; set; }
         public TcpClient TcpClient { get; set; }
         public UserTestState TestState { get; set; }
