@@ -139,13 +139,13 @@ namespace Testing_Reloaded_Client.UI {
                 return;
             }
 
-            ReloadUi();
-
             progressBar1.Visible = false;
             lblCurrentOperation.Visible = false;
 
             testManager.TestState.State = UserTestState.UserState.Finished;
             await testManager.SendStateUpdate();
+            ReloadUi();
+            testManager.Disconnect();
             MessageBox.Show("Consegnato, ora si può chiudere RTesting", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
         }
