@@ -35,10 +35,17 @@ namespace Testing_Reloaded_Client {
 
         private string ReceivedServerMessage(Server s, JObject message) {
             if (message["Action"].ToString() == "UpdateTest") {
-                this.currentTest = (Test) message["Test"].ToObject(typeof(Test));
+                var sentTest = (Test)message["Test"].ToObject(typeof(Test));
+                this.currentTest.State = sentTest.State;
 
-                if (currentTest.State == Test.TestState.OnHold)
-                    this.TestState.State = UserState.OnHold;
+                switch (currentTest.State) {
+                    case Test.TestState.OnHold:
+                        this.TestState.State = UserState.OnHold;
+                        break;
+                    case Test.TestState.Started:
+                        this.TestState.State = UserState.Testing;
+                        break;
+                }
 
                 SendStateUpdate();
                 ReloadUI?.Invoke();

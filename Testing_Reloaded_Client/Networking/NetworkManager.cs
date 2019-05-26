@@ -12,16 +12,15 @@ using SharedLibrary.Statics;
 
 namespace Testing_Reloaded_Client.Networking {
     public class NetworkManager {
-        private TcpClient mainTcpConnection;
-        private TcpClient messageConnection;
         private Server currentServer;
 
+        private TcpClient mainTcpConnection;
+
+        private Thread messageThread;
 
         private NetworkStream networkStream;
         private StreamReader netReader;
         private StreamWriter netWriter;
-
-        private Thread messageThread;
 
         public bool ProcessMessages { get; set; } = false;
 
@@ -33,7 +32,7 @@ namespace Testing_Reloaded_Client.Networking {
 
         public NetworkManager(Server server) {
             this.currentServer = server;
-            messageThread = new Thread(MessagePool) {Name = "MessageThread", IsBackground =  true};
+            messageThread = new Thread(new ParameterizedThreadStart(MessageLoop)) {Name = "MessageThread", IsBackground =  true};
         }
 
         public async Task ConnectToServer(User user) {
@@ -52,12 +51,43 @@ namespace Testing_Reloaded_Client.Networking {
 
             await WriteLine(JsonConvert.SerializeObject(new { Action = "Connect", User = user, MessagePort = listenPort }));
             messageListener.Start(0);
-            messageConnection = await messageListener.AcceptTcpClientAsync();
+            var messageConnection = await messageListener.AcceptTcpClientAsync();
 
             var response = JObject.Parse( await ReadLine());
 
             if (response["Status"].ToString() != "OK") {
                 System.Diagnostics.Debugger.Break();
+            }
+
+            messageThread.Start(messageConnection);
+            messageListener.Stop();
+
+
+        }
+
+        private void MessageLoop(object o) {
+            TcpClient client = (TcpClient) o;
+
+            var read = new StreamReader(client.GetStream(), SharedLibrary.Statics.Constants.USED_ENCODING);
+
+            try {
+
+                while (true) {
+                    if (client.Available <= 0) {
+                        Thread.Sleep(50);
+                        continue;
+                    }
+
+                    var message = JObject.Parse(read.ReadLine());
+
+
+                    ReceivedMessageFromServer?.Invoke(currentServer, message);
+                }
+
+            } catch (ThreadAbortException ex) {
+
+
+
             }
         }
 
@@ -107,29 +137,11 @@ namespace Testing_Reloaded_Client.Networking {
             messageThread.Start();
         }
 
-        private void MessagePool() {
-            while (true) {
-                if (mainTcpConnection.Available == 0 || !ProcessMessages) {
-                    Thread.Sleep(500);
-                    continue;
-                }
-
-                string message = ReadLine().Result;
-                var json = JObject.Parse(message);
-
-                string response = ReceivedMessageFromServer?.Invoke(currentServer, json);
-
-                if (response != null) {
-                    WriteLine(response).Wait();
-                }
-            }
-
-        }
-
         public async Task Disconnect()
         {
             await WriteLine(JsonConvert.SerializeObject(new { Action = "Disconnect" }));
             mainTcpConnection.Close();
         }
+
     }
 }

@@ -108,6 +108,8 @@ namespace Testing_Reloaded_Server.Networking {
 
                         sWriter.WriteLine(JsonConvert.SerializeObject(new {Status = "OK"}));
 
+                        connectedClient.ControlConnection = messageClient;
+
                     }
 
                     if (connectedClient == null) {
@@ -149,7 +151,7 @@ namespace Testing_Reloaded_Server.Networking {
 
         public async Task SendBytes(Client client, byte[] bytes) {
 
-            var stream = client.TcpClient.GetStream();
+            var stream = client.DataConnection.GetStream();
             var wStream = new StreamWriter(stream);
 
             await wStream.WriteLineAsync(JsonConvert.SerializeObject(new {Status = "OK", FileType = "zip", Size = bytes.Length}));
@@ -166,8 +168,19 @@ namespace Testing_Reloaded_Server.Networking {
             foreach (Client client in Clients) {
                 byte[] bytes = SharedLibrary.Statics.Constants.USED_ENCODING.GetBytes($"{message}\r\n");
 
-                await client.TcpClient.GetStream().WriteAsync(bytes, 0, bytes.Length);
-                await client.TcpClient.GetStream().FlushAsync();
+                await client.DataConnection.GetStream().WriteAsync(bytes, 0, bytes.Length);
+                await client.DataConnection.GetStream().FlushAsync();
+            }
+        }
+
+        public async Task SendControlMessageToClients(string message)
+        {
+            foreach (Client client in Clients)
+            {
+                byte[] bytes = SharedLibrary.Statics.Constants.USED_ENCODING.GetBytes($"{message}\r\n");
+
+                await client.ControlConnection.GetStream().WriteAsync(bytes, 0, bytes.Length);
+                await client.ControlConnection.GetStream().FlushAsync();
             }
         }
     }

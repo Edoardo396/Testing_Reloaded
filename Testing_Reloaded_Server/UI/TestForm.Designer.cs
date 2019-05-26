@@ -1,6 +1,8 @@
-﻿namespace Testing_Reloaded_Server.UI
+﻿using System.Windows.Forms;
+
+namespace Testing_Reloaded_Server.UI
 {
-    partial class TestForm
+    partial class TestForm : Form
     {
         /// <summary>
         /// Required designer variable.

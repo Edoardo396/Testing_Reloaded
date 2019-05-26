@@ -84,7 +84,7 @@ namespace Testing_Reloaded_Server {
         }
 
         private string GetUserTest(Client c) {
-            var stream = c.TcpClient.GetStream();
+            var stream = c.DataConnection.GetStream();
             var sReader = new StreamReader(stream, SharedLibrary.Statics.Constants.USED_ENCODING);
             var dataInfo = JObject.Parse(sReader.ReadLine());
 
@@ -97,7 +97,7 @@ namespace Testing_Reloaded_Server {
 
             try {
                 memoryStream = SharedLibrary.Networking.NetworkUtils
-                    .ReadNetworkBytes(stream, size, c.TcpClient.ReceiveBufferSize)
+                    .ReadNetworkBytes(stream, size, c.DataConnection.ReceiveBufferSize)
                     .Result;
 
                 var fastZip = new FastZip();
@@ -121,8 +121,8 @@ namespace Testing_Reloaded_Server {
         }
 
         public async Task SetTestState(Test.TestState state) {
-            currentTest.State = Test.TestState.OnHold;
-            await clientsManager.SendMessageToClients(JsonConvert.SerializeObject(new { Action = "UpdateTest", Test = currentTest }));
+            currentTest.State = state;
+            await clientsManager.SendControlMessageToClients(JsonConvert.SerializeObject(new { Action = "UpdateTest", Test = currentTest }));
         }
     }
 }
