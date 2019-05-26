@@ -20,7 +20,7 @@ namespace Testing_Reloaded_Server {
         private ServerTest currentTest;
         private ClientsManager clientsManager;
 
-        public BindingList<Client> ConnectedClients => clientsManager.Clients;
+        public List<Client> ConnectedClients => clientsManager.Clients;
         public Test CurrentTest => currentTest;
 
         public delegate void ClientStatusUpdatedDelegate(Client c);

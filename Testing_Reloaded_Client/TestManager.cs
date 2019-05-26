@@ -125,9 +125,11 @@ namespace Testing_Reloaded_Client {
             this.currentTest = JsonConvert.DeserializeObject<Test>(jsonResponse["Test"].ToString());
 
             if (netManager.CurrentServer.ReconnectFlag) {
-                TestState.State = UserState.Waiting;
+                TestState.State = MapDefaultTestState(CurrentTest.State);
             } else {
-                TestState = new UserTestState { RemainingTime = currentTest.Time, State = UserState.Waiting };
+                TestState = new UserTestState {
+                    RemainingTime = currentTest.Time, State = MapDefaultTestState(CurrentTest.State)
+                };
             }
         }
 

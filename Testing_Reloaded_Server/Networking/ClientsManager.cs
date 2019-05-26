@@ -21,9 +21,9 @@ using Testing_Reloaded_Server.Models;
 
 namespace Testing_Reloaded_Server.Networking {
     public class ClientsManager {
-        private BindingList<Client> clients { get; set; }
+        private List<Client> clients { get; set; }
 
-        public BindingList<Client> Clients => clients;
+        public List<Client> Clients => clients;
 
         private TcpListener tcpListener;
         private bool running = true;
@@ -35,7 +35,7 @@ namespace Testing_Reloaded_Server.Networking {
         public event ReceivedMessageFromClientDelegate ReceivedMessageFromClient;
 
         public ClientsManager() {
-            clients = new ThreadedBindingList<Client>();
+            clients = new List<Client>();
         }
 
         public void Start() {
@@ -118,7 +118,7 @@ namespace Testing_Reloaded_Server.Networking {
 
                         // call reconnect function to reconnect the client
                         if (reconnectedClient != null && reconnectedClient.TestState.State == UserTestState.UserState.Crashed 
-                                                      && ReconnectClient(connectedClient, ref reconnectedClient, sReader, sWriter)) {
+                                                      && ReconnectClient(ref connectedClient, ref reconnectedClient, sReader, sWriter)) {
                             sWriter.WriteLine(GetJson(new { Status = "OK" }));
                             continue;
                         }
@@ -176,7 +176,7 @@ namespace Testing_Reloaded_Server.Networking {
                 connectedClient.TestState.State = UserTestState.UserState.Crashed;
         }
 
-        private bool ReconnectClient(Client connectedClient, ref Client reconnectedClient, StreamReader sr, StreamWriter sw) {
+        private bool ReconnectClient(ref Client connectedClient, ref Client reconnectedClient, StreamReader sr, StreamWriter sw) {
 
             sw.WriteLine(GetJson(new { Status = "WARN", Code = "RCN", Message = "Client with same name already connected, want to reconnect" }));
 
@@ -197,8 +197,14 @@ namespace Testing_Reloaded_Server.Networking {
                 return false;
             }
 
-            reconnectedClient = connectedClient;
+            reconnectedClient.ControlConnection = connectedClient.ControlConnection;
+            reconnectedClient.DataConnection = connectedClient.DataConnection;
+            reconnectedClient.TestState = connectedClient.TestState;
+           // reconnectedClient.Id = connectedClient.Id;
+            reconnectedClient.PCHostname = connectedClient.PCHostname;
 
+
+            connectedClient = reconnectedClient;
             return true;
         }
 
