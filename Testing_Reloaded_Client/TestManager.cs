@@ -86,6 +86,15 @@ namespace Testing_Reloaded_Client {
 
         public async Task Connect() {
             await netManager.ConnectToServer(me);
+
+            JObject response = JObject.Parse(await netManager.ReadLine());
+
+            if (response["Status"].ToString() == "OK") // successfully connected, not further action needed
+                return; 
+
+
+
+
         }
 
         public async Task DownloadTestData() {

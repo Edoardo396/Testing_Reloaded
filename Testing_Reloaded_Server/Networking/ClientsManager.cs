@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -15,6 +16,7 @@ using Newtonsoft.Json.Linq;
 using SharedLibrary;
 using SharedLibrary.Models;
 using SharedLibrary.UI;
+using static SharedLibrary.Statics.Statics;
 using Testing_Reloaded_Server.Models;
 
 namespace Testing_Reloaded_Server.Networking {
@@ -86,30 +88,46 @@ namespace Testing_Reloaded_Server.Networking {
                     JObject data = JObject.Parse(json);
 
                     if (data["Action"].ToString() == "Connect") {
+                        // get next id 
                         int nextId = clients.Count == 0 ? 0 : clients.Max(ob => ob.Id) + 1;
 
                         connectedClient =
-                            new Client(nextId, JsonConvert.DeserializeObject<User>(data["User"].ToString()), client)
+                            new Client(nextId, data["User"].ToObject<User>())
                                 {TestState = new UserTestState() {State = UserTestState.UserState.Connected}};
-
-                        Thread.CurrentThread.Name = $"{connectedClient.Surname}Thread";
-                        clients.Add(connectedClient);
 
                         int messagePort = (int) data["MessagePort"];
 
+                        // start control connection
                         try {
                             messageClient.Connect(connectedClient.IP, messagePort);
                         } catch (SocketException ex) {
-                            sWriter.WriteLine(JsonConvert.SerializeObject(new {
+                            sWriter.WriteLine(GetJson(new {
                                 Status = "ERROR", ErrorCode = "MCNOP", Message = "Could not open message connection"
                             }));
                         }
 
-                        sWriter.WriteLine(JsonConvert.SerializeObject(new {Status = "OK"}));
+                        sWriter.WriteLine(GetJson(new {Status = "OK"}));
 
                         connectedClient.ControlConnection = messageClient;
+                        connectedClient.DataConnection = client;
+
+                        Thread.CurrentThread.Name = $"{connectedClient.Surname}Thread";
+
+                        var reconnectedClient = clients.FirstOrDefault(c =>
+                            c.Name == connectedClient.Name && c.Surname == connectedClient.Surname);
+
+                        // call reconnect function to reconnect the client
+                        if (reconnectedClient != null && ReconnectClient(connectedClient, ref reconnectedClient, sReader, sWriter)) {
+                            sWriter.WriteLine(GetJson(new { Status = "OK" }));
+                            continue;
+                        }
+
+                        // client cant or doesnt want to reconnect, add as new
+                        clients.Add(connectedClient);
+                        sWriter.WriteLine(GetJson(new { Status = "OK" }));
                     }
 
+                    // cannot use following functions if not yet connected
                     if (connectedClient == null) {
                         sWriter.WriteLine(JsonConvert.SerializeObject(new
                             {Status = "ERROR", Code = "SYNFIRST", Message = "Client must call Connect first"}));
@@ -118,36 +136,68 @@ namespace Testing_Reloaded_Server.Networking {
                     }
 
                     if (data["Action"].ToString() == "Disconnect") {
-                        connectedClient.ControlConnection.Close();
+                        connectedClient.ControlConnection.Close(); // close control connection
 
                         if (connectedClient.TestState.State != UserTestState.UserState.Finished) {
-                            connectedClient.TestState.State = UserTestState.UserState.Crashed;
+                            connectedClient.TestState.State = UserTestState.UserState.Crashed; // set user state
                         }
 
+                        // update ui
                         this.ReceivedMessageFromClient?.Invoke(connectedClient, data);
 
                         break;
                     }
 
+                    // send response
                     string response = this.ReceivedMessageFromClient?.Invoke(connectedClient, data);
 
                     if (response != null) {
                         sWriter.WriteLine(response);
                         sWriter.Flush();
                     }
+
+
                 } catch (Exception e) {
+                    // max 2 errors before a client is declared crashed
                     System.Diagnostics.Debug.WriteLine(
                         $"{++errorCount} fatal error with client {connectedClient}: {e.Message}");
+
                     if (errorCount > 2) {
                         connectedClient.TestState.State = UserTestState.UserState.Crashed;
                         client.Close();
                         break;
                     }
+
                 }
             }
 
             if (connectedClient.TestState.State != UserTestState.UserState.Finished)
                 connectedClient.TestState.State = UserTestState.UserState.Crashed;
+        }
+
+        private bool ReconnectClient(Client connectedClient, ref Client reconnectedClient, StreamReader sr, StreamWriter sw) {
+
+            sw.Write(GetJson(new { Status = "WARN", Code = "RCN", Message = "Client with same name already connected, want to reconnect" }));
+
+            JObject response = JObject.Parse(sr.ReadLine());
+
+            if (response["Action"].ToString() == "Ignore") {
+                return false;
+            }
+
+            sw.WriteLine(GetJson(new {Action = "Sync", UserState = reconnectedClient.TestState}));
+
+            response = JObject.Parse(sr.ReadLine());
+
+            if (response["Status"].ToString() != "OK") {
+                System.Diagnostics.Debug.WriteLine(
+                    $"{Thread.CurrentThread.Name}: Client {reconnectedClient} reconnection has failed");
+                return false;
+            }
+
+            reconnectedClient = connectedClient;
+
+            return true;
         }
 
         public async Task SendBytes(Client client, byte[] bytes) {

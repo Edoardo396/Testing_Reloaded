@@ -13,8 +13,7 @@ namespace Testing_Reloaded_Server.Models {
 
         public IPAddress IP => (DataConnection.Client.RemoteEndPoint as IPEndPoint)?.Address;
 
-        public Client(int id, User user, TcpClient client) : base(user.Name, user.Surname, user.PCHostname) {
-            this.DataConnection = client;
+        public Client(int id, User user) : base(user.Name, user.Surname, user.PCHostname) {
             this.Id = id;
         }
     }
