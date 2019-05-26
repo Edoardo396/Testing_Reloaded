@@ -9,7 +9,7 @@ namespace SharedLibrary.Statics {
             switch (s)
             {
                 case UserTestState.UserState.Connected:
-                    return Color.LightGreen;
+                    return Color.Coral;
                     break;
                 case UserTestState.UserState.Waiting:
                     return Color.Yellow;
@@ -27,7 +27,7 @@ namespace SharedLibrary.Statics {
                     return Color.DeepSkyBlue;
                     break;
                 case UserTestState.UserState.Crashed:
-                    return Color.Red;
+                    return Color.DarkRed;
                     break;
                 default: throw new ArgumentOutOfRangeException(nameof(s), s, null);
             }
