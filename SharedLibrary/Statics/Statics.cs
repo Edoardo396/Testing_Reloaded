@@ -1,6 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SharedLibrary.Models;
 
 namespace SharedLibrary.Statics {
     public class Statics {
@@ -14,6 +15,24 @@ namespace SharedLibrary.Statics {
 
         public static string GetJson(object obj) {
             return JsonConvert.SerializeObject(obj);
+        }
+
+        public static UserTestState.UserState MapDefaultTestState(Test.TestState s) {
+            switch (s) {
+                case Test.TestState.NotStarted:
+                    return UserTestState.UserState.Waiting;
+                    
+                case Test.TestState.Started:
+                    return UserTestState.UserState.Testing;
+                    
+                case Test.TestState.OnHold:
+                    return UserTestState.UserState.OnHold;
+                    case Test.TestState.Finished:
+                    return UserTestState.UserState.Finished;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(s), s, null);
+            }
         }
     }
 }

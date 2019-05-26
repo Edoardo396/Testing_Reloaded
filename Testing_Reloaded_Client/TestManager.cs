@@ -12,6 +12,7 @@ using SharedLibrary.Models;
 using SharedLibrary.Statics;
 using Testing_Reloaded_Client.Networking;
 using static SharedLibrary.Models.UserTestState;
+using static SharedLibrary.Statics.Statics;
 
 namespace Testing_Reloaded_Client {
     public class TestManager {
@@ -90,11 +91,25 @@ namespace Testing_Reloaded_Client {
             JObject response = JObject.Parse(await netManager.ReadLine());
 
             if (response["Status"].ToString() == "OK") // successfully connected, not further action needed
-                return; 
+                return;
 
+            // reconnect logic
+            if (response["Code"].ToString() == "RCN") {
+                await netManager.WriteLine(GetJson(new
+                    {Action = "Reconnect"})); // TODO Defaulting to reconnect, ask for confirm
 
+                JObject syncMessage = JObject.Parse(await netManager.ReadLine());
 
+                ReceivedServerMessage(netManager.CurrentServer, syncMessage); // sync local state
 
+                // TODO Download files
+
+                await netManager.WriteLine(GetJson(new {Status = "OK"}));
+
+                netManager.CurrentServer.ReconnectFlag = true;
+
+                await netManager.ReadLine();
+            }
         }
 
         public async Task DownloadTestData() {
@@ -108,11 +123,19 @@ namespace Testing_Reloaded_Client {
             var jsonResponse = JObject.Parse(response);
 
             this.currentTest = JsonConvert.DeserializeObject<Test>(jsonResponse["Test"].ToString());
-            TestState = new UserTestState {RemainingTime = currentTest.Time, State = UserState.Waiting};
+
+            if (netManager.CurrentServer.ReconnectFlag) {
+                TestState.State = UserState.Waiting;
+            } else {
+                TestState = new UserTestState { RemainingTime = currentTest.Time, State = UserState.Waiting };
+            }
         }
 
         public async Task WaitForTestStart() {
-            if (currentTest.State != Test.TestState.NotStarted) return;
+            if (currentTest.State != Test.TestState.NotStarted) {
+                this.TestState.State = UserState.Testing;
+                return;
+            }
 
             await SendStateUpdate();
 
@@ -129,7 +152,6 @@ namespace Testing_Reloaded_Client {
 
         public async Task Disconnect() {
             await netManager.Disconnect();
-
         }
 
         public void TestStarted() {
@@ -137,15 +159,20 @@ namespace Testing_Reloaded_Client {
         }
 
         public async Task DownloadTestDocumentation() {
-            netManager.ProcessMessages = false;
+            // netManager.ProcessMessages = false;
             TestState.State = UserState.DownloadingDocs;
 
-            await SendStateUpdate();
+            // await SendStateUpdate();
 
             string path = ResolvePath(currentTest.ClientTestPath);
-            if (Directory.Exists(path))
+
+
+            if (Directory.Exists(path) && !netManager.CurrentServer.ReconnectFlag)
                 Directory.Delete(path, true);
-            Directory.CreateDirectory(path);
+
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
 
             var packet = new {Action = "GetTestDocs"};
 
@@ -157,6 +184,9 @@ namespace Testing_Reloaded_Client {
             var file = await netManager.ReadData();
 
             if (file != null) {
+                if (Directory.Exists(Path.Combine(path, "Documentation")))
+                    Directory.Delete(Path.Combine(path, "Documentation"), true);
+
                 Directory.CreateDirectory(Path.Combine(path, "Documentation"));
 
                 fastZip.ExtractZip(file, Path.Combine(path, "Documentation"), FastZip.Overwrite.Always, null, "",
@@ -177,7 +207,7 @@ namespace Testing_Reloaded_Client {
             if (TestState.State == UserTestState.UserState.Testing)
                 TestState.RemainingTime -= TimeSpan.FromSeconds(seconds);
 
-            if (TestState.RemainingTime.Seconds == 0)
+            if (TestState.RemainingTime.Seconds % 2 == 0)
                 SendStateUpdate();
         }
 

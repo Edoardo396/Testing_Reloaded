@@ -20,6 +20,8 @@ namespace Testing_Reloaded_Client.UI {
 
         private void ReloadUi() {
             this.Invoke(new Action(() => {
+                if (testManager.CurrentTest == null) return;
+
                 lblTestName.Text = testManager.CurrentTest.TestName;
                 lblTestDuration.Text = testManager.CurrentTest.Time.ToString();
                 lblRemainingTime.Text = testManager.CurrentTest.Time.ToString();

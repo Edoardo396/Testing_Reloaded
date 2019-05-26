@@ -14,6 +14,8 @@ namespace Testing_Reloaded_Client.Networking {
     public class NetworkManager {
         private Server currentServer;
 
+        public Server CurrentServer => currentServer;
+
         private TcpClient mainTcpConnection;
 
         private Thread messageThread;

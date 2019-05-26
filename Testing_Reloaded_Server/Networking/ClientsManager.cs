@@ -99,7 +99,7 @@ namespace Testing_Reloaded_Server.Networking {
 
                         // start control connection
                         try {
-                            messageClient.Connect(connectedClient.IP, messagePort);
+                            messageClient.Connect((client.Client.RemoteEndPoint as IPEndPoint).Address, messagePort);
                         } catch (SocketException ex) {
                             sWriter.WriteLine(GetJson(new {
                                 Status = "ERROR", ErrorCode = "MCNOP", Message = "Could not open message connection"
@@ -117,7 +117,8 @@ namespace Testing_Reloaded_Server.Networking {
                             c.Name == connectedClient.Name && c.Surname == connectedClient.Surname);
 
                         // call reconnect function to reconnect the client
-                        if (reconnectedClient != null && ReconnectClient(connectedClient, ref reconnectedClient, sReader, sWriter)) {
+                        if (reconnectedClient != null && reconnectedClient.TestState.State == UserTestState.UserState.Crashed 
+                                                      && ReconnectClient(connectedClient, ref reconnectedClient, sReader, sWriter)) {
                             sWriter.WriteLine(GetJson(new { Status = "OK" }));
                             continue;
                         }
@@ -177,13 +178,14 @@ namespace Testing_Reloaded_Server.Networking {
 
         private bool ReconnectClient(Client connectedClient, ref Client reconnectedClient, StreamReader sr, StreamWriter sw) {
 
-            sw.Write(GetJson(new { Status = "WARN", Code = "RCN", Message = "Client with same name already connected, want to reconnect" }));
+            sw.WriteLine(GetJson(new { Status = "WARN", Code = "RCN", Message = "Client with same name already connected, want to reconnect" }));
 
             JObject response = JObject.Parse(sr.ReadLine());
 
             if (response["Action"].ToString() == "Ignore") {
                 return false;
             }
+
 
             sw.WriteLine(GetJson(new {Action = "Sync", UserState = reconnectedClient.TestState}));
 
