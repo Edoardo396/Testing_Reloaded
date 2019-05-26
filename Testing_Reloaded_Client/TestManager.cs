@@ -120,6 +120,7 @@ namespace Testing_Reloaded_Client {
 
         public async Task Disconnect() {
             await netManager.Disconnect();
+
         }
 
         public void TestStarted() {
@@ -130,7 +131,7 @@ namespace Testing_Reloaded_Client {
             netManager.ProcessMessages = false;
             TestState.State = UserState.DownloadingDocs;
 
-            // await SendStateUpdate();
+            await SendStateUpdate();
 
             string path = ResolvePath(currentTest.ClientTestPath);
             if (Directory.Exists(path))
@@ -154,8 +155,6 @@ namespace Testing_Reloaded_Client {
 
                 var result = await netManager.ReadLine();
             }
-
-            // netManager.StartListeningForMessages();
         }
 
         public async Task SendStateUpdate() {

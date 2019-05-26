@@ -87,8 +87,9 @@ namespace Testing_Reloaded_Client.Networking {
             } catch (ThreadAbortException ex) {
 
 
-
             }
+
+            client.Close();
         }
 
         public async Task WriteLine(string data) {
@@ -133,14 +134,11 @@ namespace Testing_Reloaded_Client.Networking {
             }
         }
 
-        public void StartListeningForMessages() {
-            messageThread.Start();
-        }
-
         public async Task Disconnect()
         {
             await WriteLine(JsonConvert.SerializeObject(new { Action = "Disconnect" }));
             mainTcpConnection.Close();
+            messageThread.Abort();
         }
 
     }

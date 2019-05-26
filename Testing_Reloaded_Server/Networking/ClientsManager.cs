@@ -118,6 +118,8 @@ namespace Testing_Reloaded_Server.Networking {
                     }
 
                     if (data["Action"].ToString() == "Disconnect") {
+                        connectedClient.ControlConnection.Close();
+
                         if (connectedClient.TestState.State != UserTestState.UserState.Finished) {
                             connectedClient.TestState.State = UserTestState.UserState.Crashed;
                         }
