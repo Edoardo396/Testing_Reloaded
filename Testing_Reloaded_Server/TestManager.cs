@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using SharedLibrary;
 using SharedLibrary.Models;
 using Testing_Reloaded_Server.Models;
 using Testing_Reloaded_Server.Networking;
+using static SharedLibrary.Statics.Statics;
 
 namespace Testing_Reloaded_Server {
     public class TestManager {
@@ -105,14 +107,10 @@ namespace Testing_Reloaded_Server {
                 fastZip.ExtractZip(memoryStream, Path.Combine(currentTest.HandoverDirectory, c.ToString()),
                     FastZip.Overwrite.Always, null, null, null, true, true);
 
-                return JsonConvert.SerializeObject(new { Status = "OK" });
+                return JsonConvert.SerializeObject(new {Status = "OK"});
             } catch (Exception e) {
-
-                return JsonConvert.SerializeObject(new { Status = "Error", ErrorCode = "HNDFAIL", Message = e.Message });
-
+                return JsonConvert.SerializeObject(new {Status = "Error", ErrorCode = "HNDFAIL", Message = e.Message});
             }
-
-           
         }
 
         public async Task StartTest() {
@@ -122,7 +120,37 @@ namespace Testing_Reloaded_Server {
 
         public async Task SetTestState(Test.TestState state) {
             currentTest.State = state;
-            await clientsManager.SendControlMessageToClients(JsonConvert.SerializeObject(new { Action = "UpdateTest", Test = currentTest }));
+            await clientsManager.SendControlMessageToClients(
+                JsonConvert.SerializeObject(new {Action = "UpdateTest", Test = currentTest}), c => true);
+        }
+
+        public async Task SyncClient(Test.TestState state, Predicate<Client> clients) {
+            foreach (var client in ConnectedClients.Where(clients.Invoke)) {
+                await clientsManager.SendControlMessageToClient(
+                    GetJson(new {Action = "Sync", State = client.TestState}), client);
+            }
+        }
+
+        public async Task AddTime(TimeSpan span, Predicate<Client> predicate) {
+            await clientsManager.SendControlMessageToClients(GetJson(new {Action = "AddTime", TimeSpan = span}),
+                predicate);
+        }
+
+        public async Task ToggleStateForClients(Predicate<Client> predicate) {
+            foreach (var client in ConnectedClients.Where(predicate.Invoke)) {
+
+                if(client.TestState.State != UserTestState.UserState.OnHold && client.TestState.State != UserTestState.UserState.Testing) continue;
+
+                if (client.TestState.State == UserTestState.UserState.Testing) {
+                    await clientsManager.SendControlMessageToClient(GetJson(new {Action = "Pause"}), client);
+                    client.TestState.State = UserTestState.UserState.OnHold;
+                } else if (client.TestState.State == UserTestState.UserState.OnHold) {
+                    await clientsManager.SendControlMessageToClient(GetJson(new {Action = "Resume"}), client);
+                    client.TestState.State = UserTestState.UserState.Testing;
+                }
+
+                ClientStatusUpdated?.Invoke(client);
+            }
         }
     }
 }

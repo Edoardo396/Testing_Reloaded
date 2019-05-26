@@ -32,19 +32,19 @@ namespace Testing_Reloaded_Server.UI
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.grpClientControls = new System.Windows.Forms.GroupBox();
-            this.button3 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.btnToggleStateClient = new System.Windows.Forms.Button();
+            this.btnForceHandover = new System.Windows.Forms.Button();
             this.lblSelectedClient = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.btnTimeAdd = new System.Windows.Forms.Button();
+            this.txtTime = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.lvClients = new System.Windows.Forms.ListView();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.btnTestPause = new System.Windows.Forms.Button();
             this.btnTestStart = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.btnTestPause = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.grpClientControls.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -63,12 +63,12 @@ namespace Testing_Reloaded_Server.UI
             // 
             // grpClientControls
             // 
-            this.grpClientControls.Controls.Add(this.button3);
-            this.grpClientControls.Controls.Add(this.button2);
+            this.grpClientControls.Controls.Add(this.btnToggleStateClient);
+            this.grpClientControls.Controls.Add(this.btnForceHandover);
             this.grpClientControls.Controls.Add(this.lblSelectedClient);
             this.grpClientControls.Controls.Add(this.label3);
-            this.grpClientControls.Controls.Add(this.button1);
-            this.grpClientControls.Controls.Add(this.textBox1);
+            this.grpClientControls.Controls.Add(this.btnTimeAdd);
+            this.grpClientControls.Controls.Add(this.txtTime);
             this.grpClientControls.Controls.Add(this.label2);
             this.grpClientControls.Location = new System.Drawing.Point(340, 16);
             this.grpClientControls.Name = "grpClientControls";
@@ -77,23 +77,24 @@ namespace Testing_Reloaded_Server.UI
             this.grpClientControls.TabStop = false;
             this.grpClientControls.Text = "Client";
             // 
-            // button3
+            // btnToggleStateClient
             // 
-            this.button3.Location = new System.Drawing.Point(146, 223);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(90, 33);
-            this.button3.TabIndex = 12;
-            this.button3.Text = "Pausa";
-            this.button3.UseVisualStyleBackColor = true;
+            this.btnToggleStateClient.Location = new System.Drawing.Point(146, 223);
+            this.btnToggleStateClient.Name = "btnToggleStateClient";
+            this.btnToggleStateClient.Size = new System.Drawing.Size(90, 33);
+            this.btnToggleStateClient.TabIndex = 12;
+            this.btnToggleStateClient.Text = "Pausa";
+            this.btnToggleStateClient.UseVisualStyleBackColor = true;
+            this.btnToggleStateClient.Click += new System.EventHandler(this.BtnToggleStateClient_Click);
             // 
-            // button2
+            // btnForceHandover
             // 
-            this.button2.Location = new System.Drawing.Point(14, 223);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(90, 33);
-            this.button2.TabIndex = 11;
-            this.button2.Text = "Ritira";
-            this.button2.UseVisualStyleBackColor = true;
+            this.btnForceHandover.Location = new System.Drawing.Point(14, 223);
+            this.btnForceHandover.Name = "btnForceHandover";
+            this.btnForceHandover.Size = new System.Drawing.Size(90, 33);
+            this.btnForceHandover.TabIndex = 11;
+            this.btnForceHandover.Text = "Ritira";
+            this.btnForceHandover.UseVisualStyleBackColor = true;
             // 
             // lblSelectedClient
             // 
@@ -112,21 +113,22 @@ namespace Testing_Reloaded_Server.UI
             this.label3.TabIndex = 9;
             this.label3.Text = "Selezionato:";
             // 
-            // button1
+            // btnTimeAdd
             // 
-            this.button1.Location = new System.Drawing.Point(146, 68);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(90, 33);
-            this.button1.TabIndex = 8;
-            this.button1.Text = "Aggiungi tempo";
-            this.button1.UseVisualStyleBackColor = true;
+            this.btnTimeAdd.Location = new System.Drawing.Point(146, 68);
+            this.btnTimeAdd.Name = "btnTimeAdd";
+            this.btnTimeAdd.Size = new System.Drawing.Size(90, 33);
+            this.btnTimeAdd.TabIndex = 8;
+            this.btnTimeAdd.Text = "Aggiungi tempo";
+            this.btnTimeAdd.UseVisualStyleBackColor = true;
+            this.btnTimeAdd.Click += new System.EventHandler(this.BtnTimeAdd_Click);
             // 
-            // textBox1
+            // txtTime
             // 
-            this.textBox1.Location = new System.Drawing.Point(27, 81);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(113, 20);
-            this.textBox1.TabIndex = 7;
+            this.txtTime.Location = new System.Drawing.Point(27, 81);
+            this.txtTime.Name = "txtTime";
+            this.txtTime.Size = new System.Drawing.Size(113, 20);
+            this.txtTime.TabIndex = 7;
             // 
             // label2
             // 
@@ -159,6 +161,16 @@ namespace Testing_Reloaded_Server.UI
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Opzioni Test";
             // 
+            // btnTestPause
+            // 
+            this.btnTestPause.Location = new System.Drawing.Point(172, 239);
+            this.btnTestPause.Name = "btnTestPause";
+            this.btnTestPause.Size = new System.Drawing.Size(90, 33);
+            this.btnTestPause.TabIndex = 14;
+            this.btnTestPause.Text = "Pausa Test";
+            this.btnTestPause.UseVisualStyleBackColor = true;
+            this.btnTestPause.Click += new System.EventHandler(this.Button4_Click);
+            // 
             // btnTestStart
             // 
             this.btnTestStart.Location = new System.Drawing.Point(16, 239);
@@ -189,16 +201,6 @@ namespace Testing_Reloaded_Server.UI
             this.label4.TabIndex = 3;
             this.label4.Text = "Test";
             // 
-            // btnTestPause
-            // 
-            this.btnTestPause.Location = new System.Drawing.Point(172, 239);
-            this.btnTestPause.Name = "btnTestPause";
-            this.btnTestPause.Size = new System.Drawing.Size(90, 33);
-            this.btnTestPause.TabIndex = 14;
-            this.btnTestPause.Text = "Pausa Test";
-            this.btnTestPause.UseVisualStyleBackColor = true;
-            this.btnTestPause.Click += new System.EventHandler(this.Button4_Click);
-            // 
             // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -222,14 +224,14 @@ namespace Testing_Reloaded_Server.UI
         #endregion
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.ListView lvClients;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button btnTimeAdd;
+        private System.Windows.Forms.TextBox txtTime;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.GroupBox grpClientControls;
         private System.Windows.Forms.Label lblSelectedClient;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btnToggleStateClient;
+        private System.Windows.Forms.Button btnForceHandover;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label4;

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using SharedLibrary.Models;
 using SharedLibrary.Statics;
@@ -7,9 +9,10 @@ using Testing_Reloaded_Server.Networking;
 
 namespace Testing_Reloaded_Server.UI {
     public partial class TestForm : Form {
-
         private ServerPublishingManager publishingManager;
         private TestManager testManager;
+
+        private int? selectedId = null;
 
         public TestForm(TestManager manager) {
             InitializeComponent();
@@ -41,6 +44,8 @@ namespace Testing_Reloaded_Server.UI {
                 lvClients.Items.Clear();
                 foreach (Client client in testManager.ConnectedClients) {
                     var item = new ListViewItem(client.Id.ToString());
+
+                    item.Name = client.Id.ToString();
 
                     string state = client.TestState?.State.ToString();
                     string rtime = client.TestState?.RemainingTime.ToString();
@@ -82,6 +87,16 @@ namespace Testing_Reloaded_Server.UI {
                 await testManager.SetTestState(Test.TestState.Started);
                 btnTestPause.Text = "Pausa Test";
             }
+        }
+
+        private async void BtnTimeAdd_Click(object sender, EventArgs e) {
+            await testManager.AddTime(TimeSpan.Parse(txtTime.Text),
+                c => lvClients.SelectedItems.ContainsKey(c.Id.ToString()));
+        }
+
+        private async void BtnToggleStateClient_Click(object sender, EventArgs e) {
+            await testManager.ToggleStateForClients(c => lvClients.SelectedItems.ContainsKey(c.Id.ToString()));
+            btnToggleStateClient.Text = btnToggleStateClient.Text == "Pausa" ? "Riavvia" : "Pausa";
         }
     }
 }

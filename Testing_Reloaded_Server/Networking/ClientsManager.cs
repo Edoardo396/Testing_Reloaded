@@ -38,7 +38,7 @@ namespace Testing_Reloaded_Server.Networking {
 
         public void Start() {
             tcpListener = new TcpListener(new IPEndPoint(IPAddress.Any, SharedLibrary.Statics.Constants.SERVER_PORT));
-            clientsThread = new Thread(LoopClients) {Name = "LoopingThread", IsBackground = true };
+            clientsThread = new Thread(LoopClients) {Name = "LoopingThread", IsBackground = true};
             clientsThread.Start();
         }
 
@@ -54,7 +54,7 @@ namespace Testing_Reloaded_Server.Networking {
 
         private void HandleClient(object o) {
             TcpClient client = (TcpClient) o;
-            
+
             TcpClient messageClient = new TcpClient();
 
             var stream = client.GetStream();
@@ -70,7 +70,6 @@ namespace Testing_Reloaded_Server.Networking {
                 string json = "";
 
                 try {
-
                     if (stream.DataAvailable) {
                         lock (tcpListener) {
                             json = sReader.ReadLine();
@@ -96,7 +95,7 @@ namespace Testing_Reloaded_Server.Networking {
                         Thread.CurrentThread.Name = $"{connectedClient.Surname}Thread";
                         clients.Add(connectedClient);
 
-                        int messagePort = (int)data["MessagePort"];
+                        int messagePort = (int) data["MessagePort"];
 
                         try {
                             messageClient.Connect(connectedClient.IP, messagePort);
@@ -109,7 +108,6 @@ namespace Testing_Reloaded_Server.Networking {
                         sWriter.WriteLine(JsonConvert.SerializeObject(new {Status = "OK"}));
 
                         connectedClient.ControlConnection = messageClient;
-
                     }
 
                     if (connectedClient == null) {
@@ -136,7 +134,8 @@ namespace Testing_Reloaded_Server.Networking {
                         sWriter.Flush();
                     }
                 } catch (Exception e) {
-                    System.Diagnostics.Debug.WriteLine($"{++errorCount} fatal error with client {connectedClient}: {e.Message}");
+                    System.Diagnostics.Debug.WriteLine(
+                        $"{++errorCount} fatal error with client {connectedClient}: {e.Message}");
                     if (errorCount > 2) {
                         connectedClient.TestState.State = UserTestState.UserState.Crashed;
                         client.Close();
@@ -150,11 +149,11 @@ namespace Testing_Reloaded_Server.Networking {
         }
 
         public async Task SendBytes(Client client, byte[] bytes) {
-
             var stream = client.DataConnection.GetStream();
             var wStream = new StreamWriter(stream);
 
-            await wStream.WriteLineAsync(JsonConvert.SerializeObject(new {Status = "OK", FileType = "zip", Size = bytes.Length}));
+            await wStream.WriteLineAsync(JsonConvert.SerializeObject(new
+                {Status = "OK", FileType = "zip", Size = bytes.Length}));
             await wStream.FlushAsync();
 
             foreach (byte b in bytes) {
@@ -173,15 +172,22 @@ namespace Testing_Reloaded_Server.Networking {
             }
         }
 
-        public async Task SendControlMessageToClients(string message)
-        {
-            foreach (Client client in Clients)
-            {
+        public async Task SendControlMessageToClients(string message, Predicate<Client> predicate) {
+            foreach (Client client in Clients) {
+                if (!predicate.Invoke(client)) continue;
+
                 byte[] bytes = SharedLibrary.Statics.Constants.USED_ENCODING.GetBytes($"{message}\r\n");
 
                 await client.ControlConnection.GetStream().WriteAsync(bytes, 0, bytes.Length);
                 await client.ControlConnection.GetStream().FlushAsync();
             }
+        }
+
+        public async Task SendControlMessageToClient(string message, Client client) {
+            byte[] bytes = SharedLibrary.Statics.Constants.USED_ENCODING.GetBytes($"{message}\r\n");
+
+            await client.ControlConnection.GetStream().WriteAsync(bytes, 0, bytes.Length);
+            await client.ControlConnection.GetStream().FlushAsync();
         }
     }
 }

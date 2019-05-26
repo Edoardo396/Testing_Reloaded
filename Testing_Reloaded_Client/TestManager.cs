@@ -35,7 +35,7 @@ namespace Testing_Reloaded_Client {
 
         private string ReceivedServerMessage(Server s, JObject message) {
             if (message["Action"].ToString() == "UpdateTest") {
-                var sentTest = (Test)message["Test"].ToObject(typeof(Test));
+                var sentTest = (Test) message["Test"].ToObject(typeof(Test));
                 this.currentTest.State = sentTest.State;
 
                 switch (currentTest.State) {
@@ -52,6 +52,29 @@ namespace Testing_Reloaded_Client {
                 return null;
             }
 
+            if (message["Action"].ToString() == "AddTime") {
+                var time = (TimeSpan) message["TimeSpan"];
+                this.TestState.RemainingTime += time;
+
+                SendStateUpdate();
+                ReloadUI?.Invoke();
+                return null;
+            }
+
+            if (message["Action"].ToString() == "Sync") {
+                this.TestState = message["UserState"].ToObject<UserTestState>();
+                ReloadUI?.Invoke();
+            }
+
+            if (message["Action"].ToString() == "Pause") {
+                this.TestState.State = UserTestState.UserState.OnHold;
+                ReloadUI?.Invoke();
+            }
+
+            if (message["Action"].ToString() == "Resume") {
+                this.TestState.State = UserTestState.UserState.Testing;
+                ReloadUI?.Invoke();
+            }
 
             return null;
         }
@@ -95,8 +118,7 @@ namespace Testing_Reloaded_Client {
             }
         }
 
-        public async Task Disconnect()
-        {
+        public async Task Disconnect() {
             await netManager.Disconnect();
         }
 
@@ -144,7 +166,7 @@ namespace Testing_Reloaded_Client {
 
         // must be called every 1 second
         public void TimeElapsed(uint seconds) {
-            if (currentTest.State == Test.TestState.Started)
+            if (TestState.State == UserTestState.UserState.Testing)
                 TestState.RemainingTime -= TimeSpan.FromSeconds(seconds);
 
             if (TestState.RemainingTime.Seconds == 0)
@@ -153,7 +175,7 @@ namespace Testing_Reloaded_Client {
 
         public async Task Handover() {
             netManager.ProcessMessages = false;
-            
+
             await netManager.WriteLine(JsonConvert.SerializeObject(new {Action = "TestHandover"}));
 
             var fastZip = new FastZip();
@@ -173,11 +195,10 @@ namespace Testing_Reloaded_Client {
             if (CurrentTest.DeleteFilesAfterEnd) {
                 Directory.Delete(ResolvedTestPath, true);
             }
-
         }
 
         public void TestRunning() {
-           // netManager.ProcessMessages = true;
+            // netManager.ProcessMessages = true;
         }
     }
 }
