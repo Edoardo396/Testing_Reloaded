@@ -32,7 +32,8 @@ namespace Testing_Reloaded_Client.Networking {
 
         public NetworkManager(Server server) {
             this.currentServer = server;
-            messageThread = new Thread(new ParameterizedThreadStart(MessageLoop)) {Name = "MessageThread", IsBackground =  true};
+            messageThread = new Thread(new ParameterizedThreadStart(MessageLoop))
+                {Name = "MessageThread", IsBackground = true};
         }
 
         public async Task ConnectToServer(User user) {
@@ -49,20 +50,22 @@ namespace Testing_Reloaded_Client.Networking {
             netReader = new StreamReader(networkStream, Constants.USED_ENCODING);
             netWriter = new StreamWriter(networkStream, Constants.USED_ENCODING);
 
-            await WriteLine(JsonConvert.SerializeObject(new { Action = "Connect", User = user, MessagePort = listenPort }));
+            await WriteLine(
+                JsonConvert.SerializeObject(new {Action = "Connect", User = user, MessagePort = listenPort}));
             messageListener.Start(0);
             var messageConnection = await messageListener.AcceptTcpClientAsync();
 
-            var response = JObject.Parse( await ReadLine());
+            var response = JObject.Parse(await ReadLine());
 
             if (response["Status"].ToString() != "OK") {
-                System.Diagnostics.Debugger.Break();
+                messageConnection.Close();
+                messageListener.Stop();
+                mainTcpConnection.Close();
+                throw new Exception("Cannot establish message connection");
             }
 
             messageThread.Start(messageConnection);
             messageListener.Stop();
-
-
         }
 
         private void MessageLoop(object o) {
@@ -71,21 +74,22 @@ namespace Testing_Reloaded_Client.Networking {
             var read = new StreamReader(client.GetStream(), SharedLibrary.Statics.Constants.USED_ENCODING);
 
             try {
-
                 while (true) {
                     if (client.Available <= 0) {
                         Thread.Sleep(50);
                         continue;
                     }
 
-                    var message = JObject.Parse(read.ReadLine());
+                    try {
+                        var message = JObject.Parse(read.ReadLine());
 
 
-                    ReceivedMessageFromServer?.Invoke(currentServer, message);
+                        ReceivedMessageFromServer?.Invoke(currentServer, message);
+                    } catch (Exception e) {
+                        // ignored
+                    }
                 }
-
             } catch (ThreadAbortException ex) {
-
 
             }
 
@@ -118,28 +122,28 @@ namespace Testing_Reloaded_Client.Networking {
             var stream = mainTcpConnection.GetStream();
             var wStream = new StreamWriter(stream);
 
-            await wStream.WriteLineAsync(JsonConvert.SerializeObject(new {Status = "OK", FileType = "zip", Size = bytes.Length}));
+            await wStream.WriteLineAsync(JsonConvert.SerializeObject(new
+                {Status = "OK", FileType = "zip", Size = bytes.Length}));
             await wStream.FlushAsync();
 
             long sent = 0;
 
-            while(sent < bytes.Length) {
+            while (sent < bytes.Length) {
+                long toSend = (bytes.Length - sent) < mainTcpConnection.SendBufferSize
+                    ? (bytes.Length - sent)
+                    : mainTcpConnection.SendBufferSize;
 
-                long toSend = (bytes.Length - sent) < mainTcpConnection.SendBufferSize ? (bytes.Length - sent) : mainTcpConnection.SendBufferSize;
-
-                await stream.WriteAsync(bytes, (int)sent, (int)toSend);
+                await stream.WriteAsync(bytes, (int) sent, (int) toSend);
                 sent += toSend;
 
                 await stream.FlushAsync();
             }
         }
 
-        public async Task Disconnect()
-        {
-            await WriteLine(JsonConvert.SerializeObject(new { Action = "Disconnect" }));
+        public async Task Disconnect() {
+            await WriteLine(JsonConvert.SerializeObject(new {Action = "Disconnect"}));
             mainTcpConnection.Close();
             messageThread.Abort();
         }
-
     }
 }
