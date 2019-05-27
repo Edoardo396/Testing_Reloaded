@@ -74,29 +74,49 @@ namespace Testing_Reloaded_Server.UI {
         }
 
         private async void BtnTestStart_Click(object sender, EventArgs e) {
-            await testManager.StartTest();
-            btnTestStart.Enabled = false;
-            MessageBox.Show("Test avviato", "Test Started", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            try {
+                await testManager.StartTest();
+                btnTestStart.Enabled = false;
+                MessageBox.Show("Test avviato", "Test Started", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            } catch (Exception ex) {
+                MessageBox.Show("Error sending command, error: " + ex.Message, "Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
         }
 
         private async void Button4_Click(object sender, EventArgs e) {
-            if (testManager.CurrentTest.State == Test.TestState.Started) {
-                await testManager.SetTestState(Test.TestState.OnHold);
-                btnTestPause.Text = "Riavvia Test";
-            } else if (testManager.CurrentTest.State == Test.TestState.OnHold) {
-                await testManager.SetTestState(Test.TestState.Started);
-                btnTestPause.Text = "Pausa Test";
+            try {
+                if (testManager.CurrentTest.State == Test.TestState.Started) {
+                    await testManager.SetTestState(Test.TestState.OnHold);
+                    btnTestPause.Text = "Riavvia Test";
+                } else if (testManager.CurrentTest.State == Test.TestState.OnHold) {
+                    await testManager.SetTestState(Test.TestState.Started);
+                    btnTestPause.Text = "Pausa Test";
+                }
+            } catch (Exception ex) {
+                MessageBox.Show("Error sending command, error: " + ex.Message, "Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 
         private async void BtnTimeAdd_Click(object sender, EventArgs e) {
-            await testManager.AddTime(TimeSpan.Parse(txtTime.Text),
-                c => lvClients.SelectedItems.ContainsKey(c.Id.ToString()));
+            try {
+                await testManager.AddTime(TimeSpan.Parse(txtTime.Text),
+                    c => lvClients.SelectedItems.ContainsKey(c.Id.ToString()));
+            } catch (Exception ex) {
+                MessageBox.Show("Error sending command, error: " + ex.Message, "Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
         }
 
         private async void BtnToggleStateClient_Click(object sender, EventArgs e) {
-            await testManager.ToggleStateForClients(c => lvClients.SelectedItems.ContainsKey(c.Id.ToString()));
-            btnToggleStateClient.Text = btnToggleStateClient.Text == "Pausa" ? "Riavvia" : "Pausa";
+            try {
+                await testManager.ToggleStateForClients(c => lvClients.SelectedItems.ContainsKey(c.Id.ToString()));
+                btnToggleStateClient.Text = btnToggleStateClient.Text == "Pausa" ? "Riavvia" : "Pausa";
+            } catch (Exception ex) {
+                MessageBox.Show("Error sending command, error: " + ex.Message, "Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
         }
     }
 }

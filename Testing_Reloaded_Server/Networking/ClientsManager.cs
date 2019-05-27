@@ -117,15 +117,17 @@ namespace Testing_Reloaded_Server.Networking {
                             c.Name == connectedClient.Name && c.Surname == connectedClient.Surname);
 
                         // call reconnect function to reconnect the client
-                        if (reconnectedClient != null && reconnectedClient.TestState.State == UserTestState.UserState.Crashed 
-                                                      && ReconnectClient(ref connectedClient, ref reconnectedClient, sReader, sWriter)) {
-                            sWriter.WriteLine(GetJson(new { Status = "OK" }));
+                        if (reconnectedClient != null && reconnectedClient.TestState.State ==
+                                                      UserTestState.UserState.Crashed
+                                                      && ReconnectClient(ref connectedClient, ref reconnectedClient,
+                                                          sReader, sWriter)) {
+                            sWriter.WriteLine(GetJson(new {Status = "OK"}));
                             continue;
                         }
 
                         // client cant or doesnt want to reconnect, add as new
                         clients.Add(connectedClient);
-                        sWriter.WriteLine(GetJson(new { Status = "OK" }));
+                        sWriter.WriteLine(GetJson(new {Status = "OK"}));
                     }
 
                     // cannot use following functions if not yet connected
@@ -156,8 +158,6 @@ namespace Testing_Reloaded_Server.Networking {
                         sWriter.WriteLine(response);
                         sWriter.Flush();
                     }
-
-
                 } catch (Exception e) {
                     // max 2 errors before a client is declared crashed
                     System.Diagnostics.Debug.WriteLine(
@@ -168,7 +168,6 @@ namespace Testing_Reloaded_Server.Networking {
                         client.Close();
                         break;
                     }
-
                 }
             }
 
@@ -176,9 +175,13 @@ namespace Testing_Reloaded_Server.Networking {
                 connectedClient.TestState.State = UserTestState.UserState.Crashed;
         }
 
-        private bool ReconnectClient(ref Client connectedClient, ref Client reconnectedClient, StreamReader sr, StreamWriter sw) {
-
-            sw.WriteLine(GetJson(new { Status = "WARN", Code = "RCN", Message = "Client with same name already connected, want to reconnect" }));
+        private bool ReconnectClient(ref Client connectedClient,
+            ref Client reconnectedClient,
+            StreamReader sr,
+            StreamWriter sw) {
+            sw.WriteLine(GetJson(new {
+                Status = "WARN", Code = "RCN", Message = "Client with same name already connected, want to reconnect"
+            }));
 
             JObject response = JObject.Parse(sr.ReadLine());
 
@@ -200,7 +203,7 @@ namespace Testing_Reloaded_Server.Networking {
             reconnectedClient.ControlConnection = connectedClient.ControlConnection;
             reconnectedClient.DataConnection = connectedClient.DataConnection;
             reconnectedClient.TestState = connectedClient.TestState;
-           // reconnectedClient.Id = connectedClient.Id;
+            // reconnectedClient.Id = connectedClient.Id;
             reconnectedClient.PCHostname = connectedClient.PCHostname;
 
 
