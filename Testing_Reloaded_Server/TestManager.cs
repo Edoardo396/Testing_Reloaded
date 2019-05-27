@@ -138,8 +138,8 @@ namespace Testing_Reloaded_Server {
 
         public async Task ToggleStateForClients(Predicate<Client> predicate) {
             foreach (var client in ConnectedClients.Where(predicate.Invoke)) {
-
-                if(client.TestState.State != UserTestState.UserState.OnHold && client.TestState.State != UserTestState.UserState.Testing) continue;
+                if (client.TestState.State != UserTestState.UserState.OnHold &&
+                    client.TestState.State != UserTestState.UserState.Testing) continue;
 
                 if (client.TestState.State == UserTestState.UserState.Testing) {
                     await clientsManager.SendControlMessageToClient(GetJson(new {Action = "Pause"}), client);
