@@ -72,7 +72,7 @@ namespace Testing_Reloaded_Server.Networking {
                 string json = "";
 
                 try {
-                    if (stream.DataAvailable) {
+                    if (connectedClient == null || (connectedClient.TestState.State != UserTestState.UserState.Finishing && stream.DataAvailable)) {
                         lock (tcpListener) {
                             json = sReader.ReadLine();
                         }

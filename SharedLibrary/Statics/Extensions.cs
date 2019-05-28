@@ -26,6 +26,9 @@ namespace SharedLibrary.Statics {
                 case UserTestState.UserState.Finished:
                     return Color.DeepSkyBlue;
                     break;
+                case UserTestState.UserState.Finishing:
+                    return Color.Aqua;
+                    break;
                 case UserTestState.UserState.Crashed:
                     return Color.DarkRed;
                     break;

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip;
 using Newtonsoft.Json;
@@ -81,7 +82,10 @@ namespace Testing_Reloaded_Server {
             }
 
             if (message["Action"].ToString() == "TestHandover") {
-                return GetUserTest(c);
+                c.TestState.State = UserTestState.UserState.Finishing;
+                string response = GetUserTest(c);
+                c.TestState.State = UserTestState.UserState.Testing;
+                return response;
             }
 
             ClientStatusUpdated?.Invoke(c);
@@ -91,19 +95,11 @@ namespace Testing_Reloaded_Server {
 
         private string GetUserTest(Client c) {
             var stream = c.DataConnection.GetStream();
-            var sReader = new StreamReader(stream, SharedLibrary.Statics.Constants.USED_ENCODING);
-            var dataInfo = JObject.Parse(sReader.ReadLine());
-
-            int size = (int) dataInfo["Size"];
-
-
-            stream.ReadTimeout = 5000;
-
             MemoryStream memoryStream = null;
 
             try {
                 memoryStream = SharedLibrary.Networking.NetworkUtils
-                    .ReadNetworkBytes(stream, size, c.DataConnection.ReceiveBufferSize)
+                    .ReadNetworkBytes(stream)
                     .Result;
 
                 var fastZip = new FastZip();
@@ -154,6 +150,12 @@ namespace Testing_Reloaded_Server {
                 }
 
                 ClientStatusUpdated?.Invoke(client);
+            }
+        }
+
+        public async Task ForceHandover(Predicate<Client> predicate) {
+            foreach (var client in ConnectedClients.Where(predicate.Invoke)) {
+                await clientsManager.SendControlMessageToClient(GetJson(new {Action = "Handover"}), client);
             }
         }
     }

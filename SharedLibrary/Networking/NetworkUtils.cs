@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using Testing_Reloaded_Server.Exceptions;
 
 namespace SharedLibrary.Networking {
@@ -27,6 +28,16 @@ namespace SharedLibrary.Networking {
             }
 
             return mStream;
+        }
+
+        public static async Task<MemoryStream> ReadNetworkBytes(NetworkStream network) {
+            var reader = new StreamReader(network, SharedLibrary.Statics.Constants.USED_ENCODING);
+
+            var dataInfo = JObject.Parse(reader.ReadLine());
+
+            int size = (int)dataInfo["Size"];
+
+            return await ReadNetworkBytes(network, size);
         }
 
         public static int GetAvailablePort(int startingPort) {

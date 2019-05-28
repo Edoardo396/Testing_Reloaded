@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip;
 using Newtonsoft.Json;
@@ -214,15 +215,16 @@ namespace Testing_Reloaded_Client {
 
         // must be called every 1 second
         public async Task TimeElapsed(uint seconds) {
-            if (TestState.State == UserTestState.UserState.Testing)
+            if (TestState.State == UserTestState.UserState.Testing) {
                 TestState.RemainingTime -= TimeSpan.FromSeconds(seconds);
 
-            try {
-                if (TestState.RemainingTime.Seconds % 2 == 0)
-                    await SendStateUpdate();
-            } catch (Exception e) {
-                TestState.State = UserState.OnHold;
-                throw;
+                try {
+                    if (TestState.RemainingTime.Seconds % 30 == 0)
+                        await SendStateUpdate();
+                } catch (Exception e) {
+                    TestState.State = UserState.OnHold;
+                    throw;
+                }
             }
         }
 
@@ -232,7 +234,8 @@ namespace Testing_Reloaded_Client {
             JObject json = null;
             
             try {
-
+                await netManager.WriteLine(GetJson(new {Action = "TestHandover"}));
+                Thread.Sleep(1000);
                 fastZip.CreateZip(stream, ResolvedTestPath, true, null, @"-bin$;-obj$;-Documentation$");
                 await netManager.SendBytes(stream.ToArray());
                 json = JObject.Parse(await netManager.ReadLine());
@@ -251,6 +254,7 @@ namespace Testing_Reloaded_Client {
             }
 
             TestState.State = UserState.Finished;
+            await SendStateUpdate();
         }
     }
 }

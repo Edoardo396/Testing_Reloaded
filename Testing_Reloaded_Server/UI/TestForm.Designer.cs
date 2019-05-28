@@ -95,6 +95,7 @@ namespace Testing_Reloaded_Server.UI
             this.btnForceHandover.TabIndex = 11;
             this.btnForceHandover.Text = "Ritira";
             this.btnForceHandover.UseVisualStyleBackColor = true;
+            this.btnForceHandover.Click += new System.EventHandler(this.BtnForceHandover_Click);
             // 
             // lblSelectedClient
             // 

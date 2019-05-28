@@ -44,7 +44,7 @@ namespace Testing_Reloaded_Client.Networking {
 
 
             // set up main connection to transmit data
-            mainTcpConnection = new TcpClient(AddressFamily.InterNetwork) {ReceiveTimeout = SharedLibrary.Statics.Constants.SOCKET_TIMEOUT};
+            mainTcpConnection = new TcpClient(AddressFamily.InterNetwork) {ReceiveTimeout = SharedLibrary.Statics.Constants.SOCKET_TIMEOUT, NoDelay = true};
             await mainTcpConnection.ConnectAsync(currentServer.IP, Constants.SERVER_PORT); // try catch
             Thread.Sleep(1000);
 
@@ -129,18 +129,13 @@ namespace Testing_Reloaded_Client.Networking {
                 {Status = "OK", FileType = "zip", Size = bytes.Length}));
             await wStream.FlushAsync();
 
-            long sent = 0;
 
-            while (sent < bytes.Length) {
-                long toSend = (bytes.Length - sent) < mainTcpConnection.SendBufferSize
-                    ? (bytes.Length - sent)
-                    : mainTcpConnection.SendBufferSize;
-
-                await stream.WriteAsync(bytes, (int) sent, (int) toSend);
-                sent += toSend;
-
-                await stream.FlushAsync();
+            foreach (byte b in bytes) {
+                stream.WriteByte(b);
             }
+
+            await stream.FlushAsync();
+
         }
 
         public async Task Disconnect() {

@@ -9,6 +9,7 @@ namespace SharedLibrary.Models {
             DownloadingDocs = 2,
             Testing = 3,
             OnHold = 4,
+            Finishing = 7,
             Finished = 5,
             Crashed = 6
         }
