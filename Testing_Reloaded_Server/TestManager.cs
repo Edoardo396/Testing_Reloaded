@@ -49,6 +49,10 @@ namespace Testing_Reloaded_Server {
             clientsManager = new ClientsManager();
             clientsManager.ReceivedMessageFromClient += ClientsManagerOnReceivedMessageFromClient;
 
+            if (!Directory.Exists(test.HandoverDirectory)) {
+                Directory.CreateDirectory(test.HandoverDirectory);
+            }
+
             clientsManager.Start();
         }
 

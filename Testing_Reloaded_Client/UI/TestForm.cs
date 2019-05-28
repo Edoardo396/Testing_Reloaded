@@ -82,17 +82,25 @@ namespace Testing_Reloaded_Client.UI {
 
         private async void TestTimer_Tick(object sender, EventArgs e) {
             testManager.TimeElapsed((uint) (testTimer.Interval / 1000));
+
             lblRemainingTime.Text = testManager.TestState.RemainingTime.ToString();
 
             TimeSpan remainingTime = testManager.TestState.RemainingTime;
 
             if (Math.Abs(remainingTime.TotalSeconds) < 1) {
+                if(testManager.CurrentTest.ReclaimTestImmediately)
                 MessageBox.Show(
                     $"Il tempo è scaduto, hai un minuto per salvare e chiudere tutti i programmi che stanno usando la cartella {testManager.ResolvedTestPath}, dopodichè il file verrà inviato al server e tutte le modifiche andranno inevitabilmente perse",
                     "Tempo Scaduto", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                else {
+                    MessageBox.Show(
+                        $"Il tempo è scaduto",
+                        "Tempo Scaduto", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    testTimer.Stop();
+                }
             }
 
-            if (Math.Abs(remainingTime.TotalSeconds + 30.0) < 1) {
+            if (Math.Abs(remainingTime.TotalSeconds + 60.0) < 1 && testManager.CurrentTest.ReclaimTestImmediately) {
                 progressBar1.Visible = true;
                 lblCurrentOperation.Visible = true;
                 lblCurrentOperation.Text = "Consegna in corso";
@@ -101,8 +109,6 @@ namespace Testing_Reloaded_Client.UI {
                 MessageBox.Show("Tempo scaduto, invio in corso...", "Fine della prova", MessageBoxButtons.OK,
                     MessageBoxIcon.Exclamation);
 
-                testManager.TestState.State = UserTestState.UserState.Finished;
-                
                 await testManager.Handover();
 
                 ReloadUi();

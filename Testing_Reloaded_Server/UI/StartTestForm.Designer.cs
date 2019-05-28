@@ -105,15 +105,18 @@
             this.chbDelete.AutoSize = true;
             this.chbDelete.Location = new System.Drawing.Point(22, 122);
             this.chbDelete.Name = "chbDelete";
-            this.chbDelete.Size = new System.Drawing.Size(210, 17);
+            this.chbDelete.Size = new System.Drawing.Size(216, 17);
             this.chbDelete.TabIndex = 5;
             this.chbDelete.Tag = "onlybefore";
-            this.chbDelete.Text = "Canella file dal client dopo la consegna";
+            this.chbDelete.Text = "Cancella file dal client dopo la consegna";
             this.chbDelete.UseVisualStyleBackColor = true;
+            this.chbDelete.CheckedChanged += new System.EventHandler(this.ChbDelete_CheckedChanged);
             // 
             // chbRitira
             // 
             this.chbRitira.AutoSize = true;
+            this.chbRitira.Checked = true;
+            this.chbRitira.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chbRitira.Location = new System.Drawing.Point(22, 99);
             this.chbRitira.Name = "chbRitira";
             this.chbRitira.Size = new System.Drawing.Size(177, 17);

@@ -18,8 +18,10 @@ namespace Testing_Reloaded_Server.UI {
         }
 
         private void BtnStartTest_Click(object sender, EventArgs e) {
-            if(txtDocsDir.Text != "" && !Directory.Exists(txtDocsDir.Text)) {
-                return;
+            if (txtDocsDir.Text != "" && !Directory.Exists(txtDocsDir.Text)) {
+                MessageBox.Show(
+                    "La directory della documentazione non esiste, controlla il percorso. Se non vuoi fornire documentazione puoi lasciarlo vuoto",
+                    "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             var test = new ServerTest() {
@@ -40,6 +42,13 @@ namespace Testing_Reloaded_Server.UI {
 
             testForm.Show();
             this.Hide();
+        }
+
+        private void ChbDelete_CheckedChanged(object sender, EventArgs e) {
+            if (chbDelete.Checked)
+                MessageBox.Show(
+                    "Visto che il programma è ancora in beta consiglio di non cambiare questa impostazione.",
+                    "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

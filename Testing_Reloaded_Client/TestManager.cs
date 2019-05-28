@@ -235,6 +235,7 @@ namespace Testing_Reloaded_Client {
             if (CurrentTest.DeleteFilesAfterEnd) {
                 Directory.Delete(ResolvedTestPath, true);
             }
+
         }
 
         public void TestRunning() {
