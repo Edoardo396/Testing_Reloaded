@@ -24,7 +24,7 @@ namespace Testing_Reloaded_Client.UI {
 
                 lblTestName.Text = testManager.CurrentTest.TestName;
                 lblTestDuration.Text = testManager.CurrentTest.Time.ToString();
-                lblRemainingTime.Text = testManager.CurrentTest.Time.ToString();
+                lblRemainingTime.Text = testManager.TestState.RemainingTime.ToString();
 
                 if (testManager.CurrentTest.State != Test.TestState.NotStarted)
                     lblTestDir.Text = testManager.ResolvedTestPath;
@@ -87,6 +87,7 @@ namespace Testing_Reloaded_Client.UI {
                 MessageBox.Show(
                     $"Impossibile inviare al server aggiornamenti sullo stato del test, controlla che il server sia online. Il test è stato messo in pausa",
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ReloadUi();
             }
 
             lblRemainingTime.Text = testManager.TestState.RemainingTime.ToString();
@@ -102,6 +103,7 @@ namespace Testing_Reloaded_Client.UI {
                     MessageBox.Show(
                         $"Il tempo è scaduto",
                         "Tempo Scaduto", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    testManager.TestState.State = UserTestState.UserState.Finished;
                     testTimer.Stop();
                 }
             }
@@ -115,15 +117,21 @@ namespace Testing_Reloaded_Client.UI {
                 MessageBox.Show("Tempo scaduto, invio in corso...", "Fine della prova", MessageBoxButtons.OK,
                     MessageBoxIcon.Exclamation);
 
-                await testManager.Handover();
-
-                ReloadUi();
+                try {
+                    await testManager.Handover();
+                } catch (Exception ex) {
+                    MessageBox.Show("Errore nella consegna, controlla lo stato del server", "Fine della prova", MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    testManager.TestState.State = UserTestState.UserState.OnHold;
+                }
 
                 progressBar1.Visible = false;
                 lblCurrentOperation.Visible = false;
 
                 MessageBox.Show("Consegnato, ora si può chiudere RTesting", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+
+            ReloadUi();
         }
 
         private void BtnOpenTestDir_Click(object sender, EventArgs e) {

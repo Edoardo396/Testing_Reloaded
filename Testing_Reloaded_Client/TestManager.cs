@@ -77,6 +77,14 @@ namespace Testing_Reloaded_Client {
                 ReloadUI?.Invoke();
             }
 
+            if (message["Action"].ToString() == "Handover") {
+                try {
+                    this.Handover().Wait();
+                } catch (Exception e) {
+                    System.Diagnostics.Debug.WriteLine("Handover Failed");
+                }
+            }
+
             return null;
         }
 
@@ -241,6 +249,8 @@ namespace Testing_Reloaded_Client {
             if (CurrentTest.DeleteFilesAfterEnd) {
                 Directory.Delete(ResolvedTestPath, true);
             }
+
+            TestState.State = UserState.Finished;
         }
     }
 }
