@@ -44,7 +44,7 @@ namespace Testing_Reloaded_Client.Networking {
 
 
             // set up main connection to transmit data
-            mainTcpConnection = new TcpClient(AddressFamily.InterNetwork);
+            mainTcpConnection = new TcpClient(AddressFamily.InterNetwork) {ReceiveTimeout = SharedLibrary.Statics.Constants.SOCKET_TIMEOUT};
             await mainTcpConnection.ConnectAsync(currentServer.IP, Constants.SERVER_PORT); // try catch
             Thread.Sleep(1000);
 
@@ -56,6 +56,7 @@ namespace Testing_Reloaded_Client.Networking {
                 JsonConvert.SerializeObject(new {Action = "Connect", User = user, MessagePort = listenPort}));
             messageListener.Start(0);
             var messageConnection = await messageListener.AcceptTcpClientAsync();
+            messageConnection.ReceiveTimeout = SharedLibrary.Statics.Constants.SOCKET_TIMEOUT;
 
             var response = JObject.Parse(await ReadLine());
 

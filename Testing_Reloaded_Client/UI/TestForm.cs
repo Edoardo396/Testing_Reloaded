@@ -81,7 +81,13 @@ namespace Testing_Reloaded_Client.UI {
         }
 
         private async void TestTimer_Tick(object sender, EventArgs e) {
-            testManager.TimeElapsed((uint) (testTimer.Interval / 1000));
+            try {
+                await testManager.TimeElapsed((uint) (testTimer.Interval / 1000));
+            } catch (Exception ex) {
+                MessageBox.Show(
+                    $"Impossibile inviare al server aggiornamenti sullo stato del test, controlla che il server sia online. Il test è stato messo in pausa",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
             lblRemainingTime.Text = testManager.TestState.RemainingTime.ToString();
 
@@ -142,8 +148,6 @@ namespace Testing_Reloaded_Client.UI {
             } catch(Exception ex) {
                 MessageBox.Show("La consegna è fallita, riprova oppure richiedi la consegna manuale. Il test è stato messo in pausa", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 System.Diagnostics.Debug.WriteLine(ex.Message);
-                testManager.TestState.State = UserTestState.UserState.OnHold;
-                await testManager.SendStateUpdate();
                 return;
             }
 

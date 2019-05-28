@@ -205,28 +205,34 @@ namespace Testing_Reloaded_Client {
         }
 
         // must be called every 1 second
-        public void TimeElapsed(uint seconds) {
+        public async Task TimeElapsed(uint seconds) {
             if (TestState.State == UserTestState.UserState.Testing)
                 TestState.RemainingTime -= TimeSpan.FromSeconds(seconds);
 
-            if (TestState.RemainingTime.Seconds % 2 == 0)
-                SendStateUpdate();
+            try {
+                if (TestState.RemainingTime.Seconds % 2 == 0)
+                    await SendStateUpdate();
+            } catch (Exception e) {
+                TestState.State = UserState.OnHold;
+                throw;
+            }
         }
 
         public async Task Handover() {
-            netManager.ProcessMessages = false;
-
-            await netManager.WriteLine(JsonConvert.SerializeObject(new {Action = "TestHandover"}));
-
             var fastZip = new FastZip();
-
             var stream = new MemoryStream();
+            JObject json = null;
+            
+            try {
 
-            fastZip.CreateZip(stream, ResolvedTestPath, true, null, @"-bin$;-obj$;-Documentation$");
+                fastZip.CreateZip(stream, ResolvedTestPath, true, null, @"-bin$;-obj$;-Documentation$");
+                await netManager.SendBytes(stream.ToArray());
+                json = JObject.Parse(await netManager.ReadLine());
 
-            await netManager.SendBytes(stream.ToArray());
-
-            var json = JObject.Parse(await netManager.ReadLine());
+            } catch (Exception e) {
+                TestState.State = UserState.OnHold;
+                throw;
+            }
 
             if (json["Status"].ToString() != "OK") {
                 throw new Exception("Server error");
@@ -235,11 +241,6 @@ namespace Testing_Reloaded_Client {
             if (CurrentTest.DeleteFilesAfterEnd) {
                 Directory.Delete(ResolvedTestPath, true);
             }
-
-        }
-
-        public void TestRunning() {
-            // netManager.ProcessMessages = true;
         }
     }
 }
