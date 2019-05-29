@@ -122,20 +122,7 @@ namespace Testing_Reloaded_Client.Networking {
         }
 
         public async Task SendBytes(byte[] bytes) {
-            var stream = mainTcpConnection.GetStream();
-            var wStream = new StreamWriter(stream);
-
-            await wStream.WriteLineAsync(JsonConvert.SerializeObject(new
-                {Status = "OK", FileType = "zip", Size = bytes.Length}));
-            await wStream.FlushAsync();
-
-
-            foreach (byte b in bytes) {
-                stream.WriteByte(b);
-            }
-
-            await stream.FlushAsync();
-
+            await SharedLibrary.Networking.NetworkUtils.SendBytesToNetwork(mainTcpConnection.GetStream(), new MemoryStream(bytes));
         }
 
         public async Task Disconnect() {

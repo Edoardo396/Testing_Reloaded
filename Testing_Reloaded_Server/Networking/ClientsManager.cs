@@ -212,18 +212,7 @@ namespace Testing_Reloaded_Server.Networking {
         }
 
         public async Task SendBytes(Client client, byte[] bytes) {
-            var stream = client.DataConnection.GetStream();
-            var wStream = new StreamWriter(stream);
-
-            await wStream.WriteLineAsync(JsonConvert.SerializeObject(new
-                {Status = "OK", FileType = "zip", Size = bytes.Length}));
-            await wStream.FlushAsync();
-
-            foreach (byte b in bytes) {
-                stream.WriteByte(b);
-            }
-
-            await stream.FlushAsync();
+            await SharedLibrary.Networking.NetworkUtils.SendBytesToNetwork(client.DataConnection.GetStream(), new MemoryStream(bytes));
         }
 
         public async Task SendMessageToClients(string message) {
