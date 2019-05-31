@@ -21,7 +21,7 @@ namespace Testing_Reloaded_Client.Networking {
 
             var client = new UdpClient(new IPEndPoint(IPAddress.Any, SharedLibrary.Statics.Constants.BROADCAST_PORT_CLIENT));
 
-            var json = Constants.USED_ENCODING.GetBytes(JsonConvert.SerializeObject(new { Action = "discover" }));
+            var json = Constants.USED_ENCODING.GetBytes(JsonConvert.SerializeObject(new { Action = "Discover" }));
 
             client.Send(json, json.Length, new IPEndPoint(IPAddress.Broadcast, Constants.BROADCAST_PORT_SERVER));
 

@@ -55,7 +55,7 @@ namespace Testing_Reloaded_Client.Networking {
             netWriter = new StreamWriter(networkStream, Constants.USED_ENCODING);
 
             await WriteLine(
-                JsonConvert.SerializeObject(new {Action = "Connect", User = user, MessagePort = listenPort}));
+                JsonConvert.SerializeObject(new {Action = "Connect", User = user, MessagePort = listenPort, AppVersion = SharedLibrary.Statics.Constants.APPLICATION_VERSION.ToString()}));
 
             // wait for ok, version check
             var versionResponse = JObject.Parse(await ReadLine());

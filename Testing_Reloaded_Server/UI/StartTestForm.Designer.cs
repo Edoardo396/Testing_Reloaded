@@ -143,7 +143,7 @@
             this.txtDataDownloadPath.Size = new System.Drawing.Size(217, 20);
             this.txtDataDownloadPath.TabIndex = 1;
             this.txtDataDownloadPath.Tag = "onlybefore";
-            this.txtDataDownloadPath.Text = "%USERPROFILE%\\Desktop\\$test_name_$surname";
+            this.txtDataDownloadPath.Text = "%USERPROFILE%\\Desktop\\Temporanea\\$test_name_$surname";
             // 
             // label3
             // 
@@ -183,7 +183,7 @@
             this.txtConsegneDir.Size = new System.Drawing.Size(223, 20);
             this.txtConsegneDir.TabIndex = 8;
             this.txtConsegneDir.Tag = "onlybefore";
-            this.txtConsegneDir.Text = "C:\\Users\\M_inf2.quinta\\Desktop\\consegne";
+            this.txtConsegneDir.Text = "C:\\Users\\edoar\\Desktop\\Progetti\\Test_RT\\consegne";
             // 
             // label4
             // 
@@ -201,7 +201,7 @@
             this.txtDocsDir.Size = new System.Drawing.Size(223, 20);
             this.txtDocsDir.TabIndex = 6;
             this.txtDocsDir.Tag = "onlybefore";
-            this.txtDocsDir.Text = "C:\\Users\\M_inf2.quinta\\Desktop\\Nodejs";
+            this.txtDocsDir.Text = "C:\\Users\\edoar\\Desktop\\Progetti\\Test_RT\\docs";
             // 
             // btnStartTest
             // 

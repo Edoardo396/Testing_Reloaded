@@ -46,7 +46,6 @@
             this.cmbServers.Name = "cmbServers";
             this.cmbServers.Size = new System.Drawing.Size(213, 21);
             this.cmbServers.TabIndex = 0;
-            this.cmbServers.Text = "192.168.3.52";
             // 
             // label1
             // 

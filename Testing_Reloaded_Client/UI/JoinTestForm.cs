@@ -28,12 +28,10 @@ namespace Testing_Reloaded_Client.UI {
 
                 if (latestVersion <= SharedLibrary.Statics.Constants.APPLICATION_VERSION) return;
 
-                this.Invoke(new Action(() =>
-                {
+                this.Invoke(new Action(() => {
                     MessageBox.Show($"Nuova versione {latestVersion.ToString()} disponibile. Si prega di aggiornare",
-                    "Updater", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        "Updater", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }));
-
             }));
         }
 
@@ -64,7 +62,8 @@ namespace Testing_Reloaded_Client.UI {
         private void btnJoin_Click(object sender, EventArgs e) {
             Server server = null;
 
-            if ((cmbServers.SelectedIndex == -1 && cmbServers.Text == "" )|| txtName.Text == "" || txtSurname.Text == "")
+            if ((cmbServers.SelectedIndex == -1 && cmbServers.Text == "") || txtName.Text == "" ||
+                txtSurname.Text == "")
                 return;
 
             if (IPAddress.TryParse(cmbServers.Text, out IPAddress address)) {
@@ -77,9 +76,11 @@ namespace Testing_Reloaded_Client.UI {
 
             var mainForm = new TestForm(server, new User(txtName.Text, txtSurname.Text, Environment.MachineName));
             mainForm.Show();
-            mainForm.FormClosed += (o, args) => this.Close();
+            mainForm.FormClosed += (o, args) => {
+                if (mainForm.DialogResult == DialogResult.OK)
+                    this.Close();
+            };
             this.Hide();
-
         }
     }
 }

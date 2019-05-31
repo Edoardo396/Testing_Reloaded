@@ -41,6 +41,7 @@ namespace Testing_Reloaded_Server.UI {
                 MessageBox.Show(
                     "La directory della documentazione non esiste, controlla il percorso. Se non vuoi fornire documentazione puoi lasciarlo vuoto",
                     "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
             var test = new ServerTest() {

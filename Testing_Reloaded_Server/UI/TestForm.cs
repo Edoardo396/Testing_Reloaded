@@ -22,7 +22,7 @@ namespace Testing_Reloaded_Server.UI {
         protected override async void OnLoad(EventArgs e) {
             base.OnLoad(e);
 
-            // publishingManager = new ServerPublishingManager(testManager.CurrentTest) {AllowClientsOnHold = true};
+            publishingManager = new ServerPublishingManager(testManager.CurrentTest) {AllowClientsOnHold = true};
 
             lvClients.View = View.Details;
 
@@ -121,7 +121,8 @@ namespace Testing_Reloaded_Server.UI {
 
             private async void BtnTimeAdd_Click(object sender, EventArgs e) {
                 try {
-                    await testManager.AddTime(TimeSpan.Parse(txtTime.Text),
+                    if (!TimeSpan.TryParse(txtTime.Text, out TimeSpan times)) return;
+                    await testManager.AddTime(times,
                         c => lvClients.SelectedItems.ContainsKey(c.Id.ToString()));
                 } catch (Exception ex) {
                     MessageBox.Show("Error sending command, error: " + ex.Message, "Error", MessageBoxButtons.OK,

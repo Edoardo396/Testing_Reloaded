@@ -22,15 +22,15 @@ namespace Testing_Reloaded_Server.Networking {
         }
 
         private void ListenForNewUdpClients() {
-            listenClient = new UdpClient(new IPEndPoint(IPAddress.Any, SharedLibrary.Statics.Constants.BROADCAST_PORT_SERVER));
-            listenClient.Client.ReceiveTimeout = 2000;
+            listenClient =
+                new UdpClient(new IPEndPoint(IPAddress.Any, SharedLibrary.Statics.Constants.BROADCAST_PORT_SERVER));
 
             try {
                 while (true) {
                     var ep = new IPEndPoint(IPAddress.Any, SharedLibrary.Statics.Constants.BROADCAST_PORT_CLIENT);
 
-                    var sendBytes = SharedLibrary.Statics.Constants.USED_ENCODING.GetBytes(JsonConvert.SerializeObject(new { Action = "Report", Hostname = Environment.MachineName }));
-                    listenClient.Send(sendBytes, sendBytes.Length, new IPEndPoint(IPAddress.Broadcast, SharedLibrary.Statics.Constants.BROADCAST_PORT_CLIENT));
+                    //var sendBytes = SharedLibrary.Statics.Constants.USED_ENCODING.GetBytes(JsonConvert.SerializeObject(new { Action = "Report", Hostname = Environment.MachineName }));
+                    //listenClient.Send(sendBytes, sendBytes.Length, new IPEndPoint(IPAddress.Broadcast, SharedLibrary.Statics.Constants.BROADCAST_PORT_CLIENT));
 
                     byte[] bytes;
 
@@ -48,14 +48,14 @@ namespace Testing_Reloaded_Server.Networking {
                     var response = GetResponse(json);
                     var responseBytes = SharedLibrary.Statics.Constants.USED_ENCODING.GetBytes(response);
                     listenClient.Send(responseBytes, responseBytes.Length,
-                        new IPEndPoint(ep.Address, SharedLibrary.Statics.Constants.CLIENT_PORT));
+                        new IPEndPoint(ep.Address, SharedLibrary.Statics.Constants.BROADCAST_PORT_CLIENT));
                 }
             } catch (ThreadAbortException e) {
             }
         }
 
         private string GetResponse(JObject json) {
-            if (json["Action"].Value<string>() == "discover") {
+            if (json["Action"].Value<string>() == "Discover") {
                 return JsonConvert.SerializeObject(new
                     {Action = "Report", Hostname = Environment.MachineName});
             }

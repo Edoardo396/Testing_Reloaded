@@ -5,6 +5,7 @@ using SharedLibrary;
 using SharedLibrary.Models;
 using SharedLibrary.Statics;
 using Testing_Reloaded_Client.Networking;
+using Testing_Reloaded_Server.Exceptions;
 
 namespace Testing_Reloaded_Client.UI {
     public partial class TestForm : Form {
@@ -43,22 +44,42 @@ namespace Testing_Reloaded_Client.UI {
             progressBar1.Enabled = true;
             progressBar1.Style = ProgressBarStyle.Marquee;
 
-            lblCurrentOperation.Text = "Connessione";
-            await testManager.Connect();
+            try {
+                lblCurrentOperation.Text = "Connessione";
+                await testManager.Connect();
 
-            lblCurrentOperation.Text = "Download Dati Test";
+                lblCurrentOperation.Text = "Download Dati Test";
 
-            await testManager.DownloadTestData();
-            ReloadUi();
+                await testManager.DownloadTestData();
+                ReloadUi();
+            } catch (VersionMismatchException vme) {
+                MessageBox.Show(
+                    $"Errore di connessione, il erver e i client deveono utlizzare la stessa versione del software.\r\nVersione Server: {vme.ServerVersion}\r\nVersione del client: {vme.ClientVersion}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.DialogResult = DialogResult.Abort;
+                this.Close();
+                return;
+            } catch (Exception ex) {
+                MessageBox.Show("Connessione al server fallita. Messaggio di errore: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.DialogResult = DialogResult.Abort;
+                this.Close();
+                return;
+            }
 
             lblTestDir.Text = "Attendo inizio del test";
             lblCurrentOperation.Text = "Attendo Inizio";
 
-            await testManager.WaitForTestStart();
-            ReloadUi();
+            try {
+                await testManager.WaitForTestStart();
+                ReloadUi();
 
-            lblCurrentOperation.Text = "Download documentazione";
-            await testManager.DownloadTestDocumentation();
+                lblCurrentOperation.Text = "Download documentazione";
+                await testManager.DownloadTestDocumentation();
+            } catch (Exception ex) {
+                MessageBox.Show("Download dei dati del test fallito. Messaggio di errore: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.DialogResult = DialogResult.Abort;
+                this.Close();
+                return;
+            }
 
             lblCurrentOperation.Visible = false;
             progressBar1.Visible = false;
@@ -66,10 +87,8 @@ namespace Testing_Reloaded_Client.UI {
             string message =
                 $"Il test è iniziato.\r\nLa cartella del test è {testManager.ResolvedTestPath} puoi trovare la documentazione del test nella sottocartella Documentation se è disponibile. Quando consegnerai veraano inviati tutti i file che si trovano nella cartella del test. in bocca al lupo!";
 
-            // System.Diagnostics.Process.Start(testManager.ResolvedTestPath);
-
-
             testManager.TestState.State = UserTestState.UserState.Testing;
+
             await testManager.SendStateUpdate();
 
             MessageBox.Show(message, "Test iniziato", MessageBoxButtons.OK, MessageBoxIcon.Information);
