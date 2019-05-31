@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using SharedLibrary.Models;
 using SharedLibrary.Networking;
 using SharedLibrary.Statics;
+using Testing_Reloaded_Server.Exceptions;
 
 namespace Testing_Reloaded_Client.Networking {
     public class NetworkManager {
@@ -44,7 +45,8 @@ namespace Testing_Reloaded_Client.Networking {
 
 
             // set up main connection to transmit data
-            mainTcpConnection = new TcpClient(AddressFamily.InterNetwork) {ReceiveTimeout = SharedLibrary.Statics.Constants.SOCKET_TIMEOUT, NoDelay = true};
+            mainTcpConnection = new TcpClient(AddressFamily.InterNetwork)
+                {ReceiveTimeout = SharedLibrary.Statics.Constants.SOCKET_TIMEOUT, NoDelay = true};
             await mainTcpConnection.ConnectAsync(currentServer.IP, Constants.SERVER_PORT); // try catch
             Thread.Sleep(1000);
 
@@ -54,6 +56,24 @@ namespace Testing_Reloaded_Client.Networking {
 
             await WriteLine(
                 JsonConvert.SerializeObject(new {Action = "Connect", User = user, MessagePort = listenPort}));
+
+            // wait for ok, version check
+            var versionResponse = JObject.Parse(await ReadLine());
+
+            if (versionResponse["Status"].ToString() != "OK") {
+                mainTcpConnection.Close();
+
+                if (versionResponse["ErrorCode"].ToString() == "VRSMM")
+                    throw new VersionMismatchException(
+                        "Client server version mismatch, make sure they are running the same version") {
+                        ClientVersion = SharedLibrary.Statics.Constants.APPLICATION_VERSION,
+                        ServerVersion = versionResponse["ServerVersion"].ToObject<Version>()
+                    };
+
+                throw new Exception();
+            }
+
+
             messageListener.Start(0);
             var messageConnection = await messageListener.AcceptTcpClientAsync();
             messageConnection.ReceiveTimeout = SharedLibrary.Statics.Constants.SOCKET_TIMEOUT;
@@ -93,7 +113,6 @@ namespace Testing_Reloaded_Client.Networking {
                     }
                 }
             } catch (ThreadAbortException ex) {
-
             }
 
             client.Close();
@@ -122,7 +141,8 @@ namespace Testing_Reloaded_Client.Networking {
         }
 
         public async Task SendBytes(byte[] bytes) {
-            await SharedLibrary.Networking.NetworkUtils.SendBytesToNetwork(mainTcpConnection.GetStream(), new MemoryStream(bytes));
+            await SharedLibrary.Networking.NetworkUtils.SendBytesToNetwork(mainTcpConnection.GetStream(),
+                new MemoryStream(bytes));
         }
 
         public async Task Disconnect() {
