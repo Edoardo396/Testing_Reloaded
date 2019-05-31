@@ -67,10 +67,10 @@ namespace Testing_Reloaded_Client.Networking {
                     throw new VersionMismatchException(
                         "Client server version mismatch, make sure they are running the same version") {
                         ClientVersion = SharedLibrary.Statics.Constants.APPLICATION_VERSION,
-                        ServerVersion = versionResponse["ServerVersion"].ToObject<Version>()
+                        ServerVersion = Version.Parse(versionResponse["ServerVersion"].ToString())
                     };
 
-                throw new Exception();
+                throw new Exception("server returned error during version validation");
             }
 
 

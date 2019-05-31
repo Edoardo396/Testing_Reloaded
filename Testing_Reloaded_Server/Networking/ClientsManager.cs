@@ -105,7 +105,7 @@ namespace Testing_Reloaded_Server.Networking {
                             connectedClient.ClientAppVersion.Minor !=
                             SharedLibrary.Statics.Constants.APPLICATION_VERSION.Minor) {
 
-                            sWriter.WriteLine(GetJson(new {Status = "Error", ErrorCode = "VRSMM", ServerVersion = SharedLibrary.Statics.Constants.APPLICATION_VERSION}));
+                            sWriter.WriteLine(GetJson(new {Status = "Error", ErrorCode = "VRSMM", ServerVersion = SharedLibrary.Statics.Constants.APPLICATION_VERSION.ToString()}));
                             continue;
 
                         }
