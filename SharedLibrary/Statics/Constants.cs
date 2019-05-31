@@ -15,6 +15,6 @@ namespace SharedLibrary.Statics {
         public static int SOCKET_TIMEOUT = 50000;
         public static Encoding USED_ENCODING = Encoding.UTF8;
 
-        public static Version APPLICATION_VERSION = new Version(0, 1);
+        public static Version APPLICATION_VERSION = new Version(0, 0, 1);
     }
 }

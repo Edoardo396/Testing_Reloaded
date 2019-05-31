@@ -10,8 +10,6 @@ namespace SharedLibrary {
         private string appName;
         private GitHubClient appClient;
 
-     //  public Release LatestRelease => GetLatestRelease().Result;
-
         public ReleaseChecker(string appName) {
             this.appName = appName;
             this.appClient =

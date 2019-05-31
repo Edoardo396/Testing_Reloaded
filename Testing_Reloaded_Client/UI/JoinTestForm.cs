@@ -1,21 +1,40 @@
 ﻿using System;
 using System.Net;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using SharedLibrary;
 using SharedLibrary.Models;
 using Testing_Reloaded_Client.Networking;
 
 namespace Testing_Reloaded_Client.UI {
     public partial class JoinTestForm : Form {
         ServerManager serverManager = new ServerManager();
+        private ReleaseChecker updater;
 
         public JoinTestForm() {
             InitializeComponent();
+            updater = new ReleaseChecker("testing-reloaded-client");
         }
 
         protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
-           
-            // UpdateServerList();
+
+            Task.Run(new Action(async () => {
+                var latestRelease = await updater.GetLatestRelease();
+
+                if (latestRelease == null) return;
+
+                var latestVersion = await updater.GetLatestVersion();
+
+                if (latestVersion <= SharedLibrary.Statics.Constants.APPLICATION_VERSION) return;
+
+                this.Invoke(new Action(() =>
+                {
+                    MessageBox.Show($"Nuova versione {latestVersion.ToString()} disponibile. Si prega di aggiornare",
+                    "Updater", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }));
+
+            }));
         }
 
 
