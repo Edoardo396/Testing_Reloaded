@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace SharedLibrary.Statics {
     public static class Constants {
@@ -13,5 +14,7 @@ namespace SharedLibrary.Statics {
 
         public static int SOCKET_TIMEOUT = 50000;
         public static Encoding USED_ENCODING = Encoding.UTF8;
+
+        public static Version APPLICATION_VERSION = new Version(0, 1);
     }
 }
