@@ -58,6 +58,17 @@
   <ItemGroup>
     <Compile Include="Models\Client.cs" />
     <Compile Include="Networking\ClientsManager.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\InfoForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\InfoForm.Designer.cs">
+      <DependentUpon>InfoForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\TestForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -76,15 +87,13 @@
     <Compile Include="Networking\ServerPublishingManager.cs" />
     <Compile Include="Models\ServerTest.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
+    <EmbeddedResource Include="UI\InfoForm.resx">
+      <DependentUpon>InfoForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\StartTestForm.resx">
       <DependentUpon>StartTestForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -110,6 +119,9 @@
       <Project>{c139e9e9-3d07-4f73-afd4-9ed950efce97}</Project>
       <Name>SharedLibrary</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Custom-Icon-Design-Flatastic-1-Information.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

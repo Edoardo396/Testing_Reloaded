@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Testing_Reloaded_Client.Properties {
+namespace SharedLibrary {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Testing_Reloaded_Client.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Testing_Reloaded_Client.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SharedLibrary.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,12 +61,12 @@ namespace Testing_Reloaded_Client.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static System.Drawing.Bitmap Custom_Icon_Design_Flatastic_1_Information {
+        internal static byte[] InfoIcon {
             get {
-                object obj = ResourceManager.GetObject("Custom-Icon-Design-Flatastic-1-Information", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                object obj = ResourceManager.GetObject("InfoIcon", resourceCulture);
+                return ((byte[])(obj));
             }
         }
     }

@@ -70,5 +70,11 @@ namespace Testing_Reloaded_Server.UI {
                     "Visto che il programma è ancora in beta consiglio di non cambiare questa impostazione.",
                     "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
+        private void BtnInfo_Click(object sender, EventArgs e)
+        {
+            var frm = new InfoForm();
+            frm.ShowDialog(this);
+        }
     }
 }

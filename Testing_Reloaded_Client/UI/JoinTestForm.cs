@@ -82,5 +82,11 @@ namespace Testing_Reloaded_Client.UI {
             };
             this.Hide();
         }
+
+        private void BtnInfo_Click(object sender, EventArgs e)
+        {
+            var form = new InfoForm();
+            form.ShowDialog(this);
+        }
     }
 }

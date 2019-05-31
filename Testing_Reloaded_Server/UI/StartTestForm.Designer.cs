@@ -44,6 +44,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.txtDocsDir = new System.Windows.Forms.TextBox();
             this.btnStartTest = new System.Windows.Forms.Button();
+            this.btnInfo = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -213,11 +214,22 @@
             this.btnStartTest.UseVisualStyleBackColor = true;
             this.btnStartTest.Click += new System.EventHandler(this.BtnStartTest_Click);
             // 
+            // btnInfo
+            // 
+            this.btnInfo.Image = global::Testing_Reloaded_Server.Properties.Resources.Custom_Icon_Design_Flatastic_1_Information1;
+            this.btnInfo.Location = new System.Drawing.Point(12, 386);
+            this.btnInfo.Name = "btnInfo";
+            this.btnInfo.Size = new System.Drawing.Size(50, 41);
+            this.btnInfo.TabIndex = 9;
+            this.btnInfo.UseVisualStyleBackColor = true;
+            this.btnInfo.Click += new System.EventHandler(this.BtnInfo_Click);
+            // 
             // StartTestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(418, 439);
+            this.Controls.Add(this.btnInfo);
             this.Controls.Add(this.btnStartTest);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
@@ -252,6 +264,7 @@
         private System.Windows.Forms.Button btnStartTest;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox txtConsegneDir;
+        private System.Windows.Forms.Button btnInfo;
     }
 }
 

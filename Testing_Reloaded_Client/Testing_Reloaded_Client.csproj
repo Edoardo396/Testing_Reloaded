@@ -56,6 +56,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UI\InfoForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\InfoForm.Designer.cs">
+      <DependentUpon>InfoForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\JoinTestForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -74,6 +80,9 @@
     <Compile Include="Networking\Server.cs" />
     <Compile Include="Networking\ServerManager.cs" />
     <Compile Include="TestManager.cs" />
+    <EmbeddedResource Include="UI\InfoForm.resx">
+      <DependentUpon>InfoForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\JoinTestForm.resx">
       <DependentUpon>JoinTestForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -109,6 +118,9 @@
       <Project>{c139e9e9-3d07-4f73-afd4-9ed950efce97}</Project>
       <Name>SharedLibrary</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Custom-Icon-Design-Flatastic-1-Information.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

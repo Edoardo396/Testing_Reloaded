@@ -72,13 +72,13 @@
             // lblStatus
             // 
             this.lblStatus.AutoSize = true;
-            this.lblStatus.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.lblStatus.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
             this.lblStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblStatus.Location = new System.Drawing.Point(73, 125);
             this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(68, 20);
+            this.lblStatus.Size = new System.Drawing.Size(100, 20);
             this.lblStatus.TabIndex = 11;
-            this.lblStatus.Text = "Testing";
+            this.lblStatus.Text = "Connecting";
             // 
             // label5
             // 
@@ -105,9 +105,9 @@
             this.lblTestDuration.AutoSize = true;
             this.lblTestDuration.Location = new System.Drawing.Point(77, 58);
             this.lblTestDuration.Name = "lblTestDuration";
-            this.lblTestDuration.Size = new System.Drawing.Size(55, 13);
+            this.lblTestDuration.Size = new System.Drawing.Size(49, 13);
             this.lblTestDuration.TabIndex = 8;
-            this.lblTestDuration.Text = "100:00:00";
+            this.lblTestDuration.Text = "00:00:00";
             // 
             // label6
             // 
@@ -123,9 +123,9 @@
             this.lblTestName.AutoSize = true;
             this.lblTestName.Location = new System.Drawing.Point(77, 33);
             this.lblTestName.Name = "lblTestName";
-            this.lblTestName.Size = new System.Drawing.Size(65, 13);
+            this.lblTestName.Size = new System.Drawing.Size(27, 13);
             this.lblTestName.TabIndex = 6;
-            this.lblTestName.Text = "Test Di Test";
+            this.lblTestName.Text = "N/A";
             // 
             // label4
             // 
@@ -141,9 +141,9 @@
             this.lblTestDir.AutoSize = true;
             this.lblTestDir.Location = new System.Drawing.Point(9, 232);
             this.lblTestDir.Name = "lblTestDir";
-            this.lblTestDir.Size = new System.Drawing.Size(178, 13);
+            this.lblTestDir.Size = new System.Drawing.Size(67, 13);
             this.lblTestDir.TabIndex = 4;
-            this.lblTestDir.Text = "C:\\Users\\user\\Desktop\\Name\\Test";
+            this.lblTestDir.Text = "Attendi Inizio";
             // 
             // label2
             // 
@@ -215,7 +215,6 @@
             this.Controls.Add(this.grbTestInfo);
             this.Name = "TestForm";
             this.Text = "frmTest";
-//            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TestForm_FormClosing);
             this.grbTestInfo.ResumeLayout(false);
             this.grbTestInfo.PerformLayout();
             this.ResumeLayout(false);
