@@ -72,7 +72,9 @@ namespace Testing_Reloaded_Server.Networking {
                 string json = "";
 
                 try {
-                    if (connectedClient == null || (connectedClient.TestState.State != UserTestState.UserState.Finishing && stream.DataAvailable)) {
+                    if (connectedClient == null ||
+                        (connectedClient.TestState.State != UserTestState.UserState.Finishing &&
+                         stream.DataAvailable)) {
                         lock (tcpListener) {
                             json = sReader.ReadLine();
                         }
@@ -92,8 +94,23 @@ namespace Testing_Reloaded_Server.Networking {
                         int nextId = clients.Count == 0 ? 0 : clients.Max(ob => ob.Id) + 1;
 
                         connectedClient =
-                            new Client(nextId, data["User"].ToObject<User>())
-                                {TestState = new UserTestState() {State = UserTestState.UserState.Connected}};
+                            new Client(nextId, data["User"].ToObject<User>()) {
+                                TestState = new UserTestState() {State = UserTestState.UserState.Connected},
+                                ClientAppVersion = Version.Parse(data["AppVersion"].ToString())
+                            };
+
+                        // check version match
+                        if (connectedClient.ClientAppVersion.Major !=
+                            SharedLibrary.Statics.Constants.APPLICATION_VERSION.Major ||
+                            connectedClient.ClientAppVersion.Minor !=
+                            SharedLibrary.Statics.Constants.APPLICATION_VERSION.Minor) {
+
+                            sWriter.WriteLine(GetJson(new {Status = "Error", ErrorCode = "VRSMM", ServerVersion = SharedLibrary.Statics.Constants.APPLICATION_VERSION.ToString()}));
+                            continue;
+
+                        }
+
+                        sWriter.WriteLine(GetJson(new { Status = "OK" }));
 
                         int messagePort = (int) data["MessagePort"];
 
@@ -105,6 +122,7 @@ namespace Testing_Reloaded_Server.Networking {
                                 Status = "ERROR", ErrorCode = "MCNOP", Message = "Could not open message connection"
                             }));
                         }
+
 
                         sWriter.WriteLine(GetJson(new {Status = "OK"}));
 
@@ -212,7 +230,8 @@ namespace Testing_Reloaded_Server.Networking {
         }
 
         public async Task SendBytes(Client client, byte[] bytes) {
-            await SharedLibrary.Networking.NetworkUtils.SendBytesToNetwork(client.DataConnection.GetStream(), new MemoryStream(bytes));
+            await SharedLibrary.Networking.NetworkUtils.SendBytesToNetwork(client.DataConnection.GetStream(),
+                new MemoryStream(bytes));
         }
 
         public async Task SendMessageToClients(string message) {

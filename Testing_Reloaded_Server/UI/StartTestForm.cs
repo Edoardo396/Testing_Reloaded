@@ -3,11 +3,14 @@ using System.Windows.Forms;
 using SharedLibrary.Models;
 using Testing_Reloaded_Server.Models;
 using System.IO;
+using System.Threading.Tasks;
+using SharedLibrary;
 using Testing_Reloaded_Server.Networking;
 
 namespace Testing_Reloaded_Server.UI {
     public partial class StartTestForm : Form {
         private TestManager testManager;
+        private ReleaseChecker updater = new ReleaseChecker("testing-reloaded-server");
 
         public StartTestForm() {
             InitializeComponent();
@@ -15,6 +18,22 @@ namespace Testing_Reloaded_Server.UI {
 
         protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
+
+            Task.Run(new Action(async () => {
+                var latestRelease = await updater.GetLatestRelease();
+
+                if (latestRelease == null) return;
+
+                var latestVersion = await updater.GetLatestVersion();
+
+                if (latestVersion <= SharedLibrary.Statics.Constants.APPLICATION_VERSION) return;
+
+                this.Invoke(new Action(() => {
+                    MessageBox.Show($"Nuova versione {latestVersion.ToString()} disponibile. Si prega di aggiornare",
+                        "Updater", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }));
+
+            }));
         }
 
         private void BtnStartTest_Click(object sender, EventArgs e) {
