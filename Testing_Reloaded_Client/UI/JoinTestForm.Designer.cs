@@ -81,7 +81,6 @@
             this.txtName.Name = "txtName";
             this.txtName.Size = new System.Drawing.Size(213, 20);
             this.txtName.TabIndex = 4;
-            this.txtName.Text = "Edo";
             // 
             // txtSurname
             // 
@@ -89,7 +88,6 @@
             this.txtSurname.Name = "txtSurname";
             this.txtSurname.Size = new System.Drawing.Size(213, 20);
             this.txtSurname.TabIndex = 5;
-            this.txtSurname.Text = "F";
             // 
             // btnJoin
             // 
