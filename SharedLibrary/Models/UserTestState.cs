@@ -14,9 +14,8 @@ namespace SharedLibrary.Models {
             Crashed = 6
         }
 
-       
-
         public TimeSpan RemainingTime { get; set; }
         public UserState State { get; set; }
+        public bool OK => State == UserState.OnHold || State == UserState.Testing || State == UserState.Waiting;
     }
 }

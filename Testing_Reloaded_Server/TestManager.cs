@@ -18,8 +18,10 @@ using static SharedLibrary.Statics.Statics;
 
 namespace Testing_Reloaded_Server {
     public class TestManager {
+
         private ServerTest currentTest;
         private ClientsManager clientsManager;
+
 
         public List<Client> ConnectedClients => clientsManager.Clients;
         public Test CurrentTest => currentTest;

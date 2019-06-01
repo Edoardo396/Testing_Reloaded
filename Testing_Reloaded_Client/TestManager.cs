@@ -170,10 +170,7 @@ namespace Testing_Reloaded_Client {
         }
 
         public async Task DownloadTestDocumentation() {
-            // netManager.ProcessMessages = false;
             TestState.State = UserState.DownloadingDocs;
-
-            // await SendStateUpdate();
 
             string path = ResolvePath(currentTest.ClientTestPath);
 
@@ -203,7 +200,7 @@ namespace Testing_Reloaded_Client {
                 fastZip.ExtractZip(file, Path.Combine(path, "Documentation"), FastZip.Overwrite.Always, null, "",
                     null, false, true);
 
-                var result = await netManager.ReadLine();
+                var result = await netManager.ReadLine(); // unused
             }
         }
 
@@ -213,13 +210,13 @@ namespace Testing_Reloaded_Client {
             await netManager.WriteLine(json);
         }
 
-        // must be called every 1 second
+        // must be called to advance time
         public async Task TimeElapsed(uint seconds) {
             if (TestState.State == UserTestState.UserState.Testing) {
                 TestState.RemainingTime -= TimeSpan.FromSeconds(seconds);
 
                 try {
-                    if (TestState.RemainingTime.Seconds % 30 == 0)
+                    if ((int)TestState.RemainingTime.TotalSeconds % Constants.POLL_TIME == 0)
                         await SendStateUpdate();
                 } catch (Exception e) {
                     TestState.State = UserState.OnHold;

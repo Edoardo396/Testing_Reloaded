@@ -15,9 +15,11 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharedLibrary;
 using SharedLibrary.Models;
+using SharedLibrary.Statics;
 using SharedLibrary.UI;
 using static SharedLibrary.Statics.Statics;
 using Testing_Reloaded_Server.Models;
+using Timer = System.Threading.Timer;
 
 namespace Testing_Reloaded_Server.Networking {
     public class ClientsManager {
@@ -30,6 +32,8 @@ namespace Testing_Reloaded_Server.Networking {
 
         private Thread clientsThread;
 
+        private Timer pollTimer;
+
         public delegate string ReceivedMessageFromClientDelegate(Client c, JObject message);
 
         public event ReceivedMessageFromClientDelegate ReceivedMessageFromClient;
@@ -39,9 +43,22 @@ namespace Testing_Reloaded_Server.Networking {
         }
 
         public void Start() {
-            tcpListener = new TcpListener(new IPEndPoint(IPAddress.Any, SharedLibrary.Statics.Constants.SERVER_PORT));
+            tcpListener = new TcpListener(new IPEndPoint(IPAddress.Any, Constants.SERVER_PORT));
             clientsThread = new Thread(LoopClients) {Name = "LoopingThread", IsBackground = true};
+            pollTimer = new Timer(TimerCallback, null, TimeSpan.Zero, TimeSpan.FromSeconds(Constants.POLL_TIME));
+
             clientsThread.Start();
+        }
+
+        private void TimerCallback(object state) {
+
+            foreach (var client in clients) {
+                lock (client) {
+                    if (client.TestState.OK && (client.LastUpdate - Statics.ApplicationTime).TotalSeconds > Constants.CRASH_DECLARED_TIME)
+                        client.TestState.State = UserTestState.UserState.Crashed;
+                }
+            }
+
         }
 
         private void LoopClients() {
@@ -54,6 +71,7 @@ namespace Testing_Reloaded_Server.Networking {
             }
         }
 
+
         private void HandleClient(object o) {
             TcpClient client = (TcpClient) o;
 
@@ -61,8 +79,8 @@ namespace Testing_Reloaded_Server.Networking {
 
             var stream = client.GetStream();
 
-            var sWriter = new StreamWriter(stream, SharedLibrary.Statics.Constants.USED_ENCODING) {AutoFlush = true};
-            var sReader = new StreamReader(stream, SharedLibrary.Statics.Constants.USED_ENCODING);
+            var sWriter = new StreamWriter(stream, Constants.USED_ENCODING) {AutoFlush = true};
+            var sReader = new StreamReader(stream, Constants.USED_ENCODING);
 
             Client connectedClient = null;
 
@@ -84,101 +102,106 @@ namespace Testing_Reloaded_Server.Networking {
                     }
 
 
-                    System.Diagnostics.Debug.WriteLine($"{Thread.CurrentThread.Name}: Received from " +
+                    Debug.WriteLine($"{Thread.CurrentThread.Name}: Received from " +
                                                        $"{((IPEndPoint) client.Client.RemoteEndPoint).Address}:{((IPEndPoint) client.Client.RemoteEndPoint).Port} message {json}");
+                    lock (connectedClient) {
+                        JObject data = JObject.Parse(json);
 
-                    JObject data = JObject.Parse(json);
+                        if (data["Action"].ToString() == "Connect") {
+                            // get next id 
+                            int nextId = clients.Count == 0 ? 0 : clients.Max(ob => ob.Id) + 1;
 
-                    if (data["Action"].ToString() == "Connect") {
-                        // get next id 
-                        int nextId = clients.Count == 0 ? 0 : clients.Max(ob => ob.Id) + 1;
+                            connectedClient =
+                                new Client(nextId, data["User"].ToObject<User>()) {
+                                    TestState = new UserTestState() {State = UserTestState.UserState.Connected},
+                                    ClientAppVersion = Version.Parse(data["AppVersion"].ToString())
+                                };
 
-                        connectedClient =
-                            new Client(nextId, data["User"].ToObject<User>()) {
-                                TestState = new UserTestState() {State = UserTestState.UserState.Connected},
-                                ClientAppVersion = Version.Parse(data["AppVersion"].ToString())
-                            };
+                            // check version match
+                            if (connectedClient.ClientAppVersion.Major !=
+                                Constants.APPLICATION_VERSION.Major ||
+                                connectedClient.ClientAppVersion.Minor !=
+                                Constants.APPLICATION_VERSION.Minor) {
 
-                        // check version match
-                        if (connectedClient.ClientAppVersion.Major !=
-                            SharedLibrary.Statics.Constants.APPLICATION_VERSION.Major ||
-                            connectedClient.ClientAppVersion.Minor !=
-                            SharedLibrary.Statics.Constants.APPLICATION_VERSION.Minor) {
+                                sWriter.WriteLine(GetJson(new {
+                                    Status = "Error", ErrorCode = "VRSMM",
+                                    ServerVersion = Constants.APPLICATION_VERSION.ToString()
+                                }));
+                                continue;
 
-                            sWriter.WriteLine(GetJson(new {Status = "Error", ErrorCode = "VRSMM", ServerVersion = SharedLibrary.Statics.Constants.APPLICATION_VERSION.ToString()}));
-                            continue;
+                            }
 
-                        }
-
-                        sWriter.WriteLine(GetJson(new { Status = "OK" }));
-
-                        int messagePort = (int) data["MessagePort"];
-
-                        // start control connection
-                        try {
-                            messageClient.Connect((client.Client.RemoteEndPoint as IPEndPoint).Address, messagePort);
-                        } catch (SocketException ex) {
-                            sWriter.WriteLine(GetJson(new {
-                                Status = "ERROR", ErrorCode = "MCNOP", Message = "Could not open message connection"
-                            }));
-                        }
-
-
-                        sWriter.WriteLine(GetJson(new {Status = "OK"}));
-
-                        connectedClient.ControlConnection = messageClient;
-                        connectedClient.DataConnection = client;
-
-                        Thread.CurrentThread.Name = $"{connectedClient.Surname}Thread";
-
-                        var reconnectedClient = clients.FirstOrDefault(c =>
-                            c.Name == connectedClient.Name && c.Surname == connectedClient.Surname);
-
-                        // call reconnect function to reconnect the client
-                        if (reconnectedClient != null && reconnectedClient.TestState.State ==
-                                                      UserTestState.UserState.Crashed
-                                                      && ReconnectClient(ref connectedClient, ref reconnectedClient,
-                                                          sReader, sWriter)) {
                             sWriter.WriteLine(GetJson(new {Status = "OK"}));
+
+                            int messagePort = (int) data["MessagePort"];
+
+                            // start control connection
+                            try {
+                                messageClient.Connect((client.Client.RemoteEndPoint as IPEndPoint).Address,
+                                    messagePort);
+                            } catch (SocketException ex) {
+                                sWriter.WriteLine(GetJson(new {
+                                    Status = "ERROR", ErrorCode = "MCNOP", Message = "Could not open message connection"
+                                }));
+                            }
+
+
+                            sWriter.WriteLine(GetJson(new {Status = "OK"}));
+
+                            connectedClient.ControlConnection = messageClient;
+                            connectedClient.DataConnection = client;
+
+                            Thread.CurrentThread.Name = $"{connectedClient.Surname}Thread";
+
+                            var reconnectedClient = clients.FirstOrDefault(c =>
+                                c.Name == connectedClient.Name && c.Surname == connectedClient.Surname);
+
+                            // call reconnect function to reconnect the client
+                            if (reconnectedClient != null && reconnectedClient.TestState.State ==
+                                                          UserTestState.UserState.Crashed
+                                                          && ReconnectClient(ref connectedClient, ref reconnectedClient,
+                                                              sReader, sWriter)) {
+                                sWriter.WriteLine(GetJson(new {Status = "OK"}));
+                                continue;
+                            }
+
+                            // client cant or doesnt want to reconnect, add as new
+                            clients.Add(connectedClient);
+                            sWriter.WriteLine(GetJson(new {Status = "OK"}));
+                        }
+
+                        // cannot use following functions if not yet connected
+                        if (connectedClient == null) {
+                            sWriter.WriteLine(JsonConvert.SerializeObject(new
+                                {Status = "ERROR", Code = "SYNFIRST", Message = "Client must call Connect first"}));
+                            sWriter.Flush();
                             continue;
                         }
 
-                        // client cant or doesnt want to reconnect, add as new
-                        clients.Add(connectedClient);
-                        sWriter.WriteLine(GetJson(new {Status = "OK"}));
-                    }
+                        if (data["Action"].ToString() == "Disconnect") {
+                            connectedClient.ControlConnection.Close(); // close control connection
 
-                    // cannot use following functions if not yet connected
-                    if (connectedClient == null) {
-                        sWriter.WriteLine(JsonConvert.SerializeObject(new
-                            {Status = "ERROR", Code = "SYNFIRST", Message = "Client must call Connect first"}));
-                        sWriter.Flush();
-                        continue;
-                    }
+                            if (connectedClient.TestState.State != UserTestState.UserState.Finished) {
+                                connectedClient.TestState.State = UserTestState.UserState.Crashed; // set user state
+                            }
 
-                    if (data["Action"].ToString() == "Disconnect") {
-                        connectedClient.ControlConnection.Close(); // close control connection
+                            // update ui
+                            ReceivedMessageFromClient?.Invoke(connectedClient, data);
 
-                        if (connectedClient.TestState.State != UserTestState.UserState.Finished) {
-                            connectedClient.TestState.State = UserTestState.UserState.Crashed; // set user state
+                            break;
                         }
 
-                        // update ui
-                        this.ReceivedMessageFromClient?.Invoke(connectedClient, data);
+                        // send response
+                        string response = ReceivedMessageFromClient?.Invoke(connectedClient, data);
 
-                        break;
-                    }
-
-                    // send response
-                    string response = this.ReceivedMessageFromClient?.Invoke(connectedClient, data);
-
-                    if (response != null) {
-                        sWriter.WriteLine(response);
-                        sWriter.Flush();
+                        if (response != null) {
+                            sWriter.WriteLine(response);
+                            sWriter.Flush();
+                        }
                     }
                 } catch (Exception e) {
                     // max 2 errors before a client is declared crashed
-                    System.Diagnostics.Debug.WriteLine(
+                    Debug.WriteLine(
                         $"{++errorCount} fatal error with client {connectedClient}: {e.Message}");
 
                     if (errorCount > 2) {
@@ -213,7 +236,7 @@ namespace Testing_Reloaded_Server.Networking {
             response = JObject.Parse(sr.ReadLine());
 
             if (response["Status"].ToString() != "OK") {
-                System.Diagnostics.Debug.WriteLine(
+                Debug.WriteLine(
                     $"{Thread.CurrentThread.Name}: Client {reconnectedClient} reconnection has failed");
                 return false;
             }
@@ -236,7 +259,7 @@ namespace Testing_Reloaded_Server.Networking {
 
         public async Task SendMessageToClients(string message) {
             foreach (Client client in Clients) {
-                byte[] bytes = SharedLibrary.Statics.Constants.USED_ENCODING.GetBytes($"{message}\r\n");
+                byte[] bytes = Constants.USED_ENCODING.GetBytes($"{message}\r\n");
 
                 await client.DataConnection.GetStream().WriteAsync(bytes, 0, bytes.Length);
                 await client.DataConnection.GetStream().FlushAsync();
@@ -247,7 +270,7 @@ namespace Testing_Reloaded_Server.Networking {
             foreach (Client client in Clients) {
                 if (!predicate.Invoke(client)) continue;
 
-                byte[] bytes = SharedLibrary.Statics.Constants.USED_ENCODING.GetBytes($"{message}\r\n");
+                byte[] bytes = Constants.USED_ENCODING.GetBytes($"{message}\r\n");
 
                 await client.ControlConnection.GetStream().WriteAsync(bytes, 0, bytes.Length);
                 await client.ControlConnection.GetStream().FlushAsync();
@@ -255,7 +278,7 @@ namespace Testing_Reloaded_Server.Networking {
         }
 
         public async Task SendControlMessageToClient(string message, Client client) {
-            byte[] bytes = SharedLibrary.Statics.Constants.USED_ENCODING.GetBytes($"{message}\r\n");
+            byte[] bytes = Constants.USED_ENCODING.GetBytes($"{message}\r\n");
 
             await client.ControlConnection.GetStream().WriteAsync(bytes, 0, bytes.Length);
             await client.ControlConnection.GetStream().FlushAsync();
