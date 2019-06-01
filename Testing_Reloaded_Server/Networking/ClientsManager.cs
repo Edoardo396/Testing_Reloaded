@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,19 +47,21 @@ namespace Testing_Reloaded_Server.Networking {
             tcpListener = new TcpListener(new IPEndPoint(IPAddress.Any, Constants.SERVER_PORT));
             clientsThread = new Thread(LoopClients) {Name = "LoopingThread", IsBackground = true};
             pollTimer = new Timer(TimerCallback, null, TimeSpan.Zero, TimeSpan.FromSeconds(Constants.POLL_TIME));
-
             clientsThread.Start();
         }
 
         private void TimerCallback(object state) {
-
             foreach (var client in clients) {
                 lock (client) {
-                    if (client.TestState.OK && (client.LastUpdate - Statics.ApplicationTime).TotalSeconds > Constants.CRASH_DECLARED_TIME)
+                    if (client.TestState.OK && Math.Abs((client.LastUpdate - Statics.ApplicationTime).TotalSeconds) >
+                        Constants.CRASH_DECLARED_TIME)
                         client.TestState.State = UserTestState.UserState.Crashed;
-                }
-            }
 
+                    ReceivedMessageFromClient?.Invoke(client, null);
+                }
+
+
+            }
         }
 
         private void LoopClients() {
@@ -90,6 +93,9 @@ namespace Testing_Reloaded_Server.Networking {
                 string json = "";
 
                 try {
+
+                    if (connectedClient != null && connectedClient.TestState.State == UserTestState.UserState.Crashed) break;
+
                     if (connectedClient == null ||
                         (connectedClient.TestState.State != UserTestState.UserState.Finishing &&
                          stream.DataAvailable)) {
@@ -101,85 +107,96 @@ namespace Testing_Reloaded_Server.Networking {
                         continue;
                     }
 
-
                     Debug.WriteLine($"{Thread.CurrentThread.Name}: Received from " +
-                                                       $"{((IPEndPoint) client.Client.RemoteEndPoint).Address}:{((IPEndPoint) client.Client.RemoteEndPoint).Port} message {json}");
-                    lock (connectedClient) {
-                        JObject data = JObject.Parse(json);
+                                    $"{((IPEndPoint) client.Client.RemoteEndPoint).Address}:{((IPEndPoint) client.Client.RemoteEndPoint).Port} message {json}");
 
-                        if (data["Action"].ToString() == "Connect") {
-                            // get next id 
-                            int nextId = clients.Count == 0 ? 0 : clients.Max(ob => ob.Id) + 1;
+                    JObject data = JObject.Parse(json);
 
-                            connectedClient =
-                                new Client(nextId, data["User"].ToObject<User>()) {
-                                    TestState = new UserTestState() {State = UserTestState.UserState.Connected},
-                                    ClientAppVersion = Version.Parse(data["AppVersion"].ToString())
-                                };
+                    
+                    if (data["Action"].ToString() == "Connect") {
+                        // get next id 
+                        int nextId = clients.Count == 0 ? 0 : clients.Max(ob => ob.Id) + 1;
 
-                            // check version match
-                            if (connectedClient.ClientAppVersion.Major !=
-                                Constants.APPLICATION_VERSION.Major ||
-                                connectedClient.ClientAppVersion.Minor !=
-                                Constants.APPLICATION_VERSION.Minor) {
-
-                                sWriter.WriteLine(GetJson(new {
-                                    Status = "Error", ErrorCode = "VRSMM",
-                                    ServerVersion = Constants.APPLICATION_VERSION.ToString()
-                                }));
-                                continue;
-
-                            }
-
-                            sWriter.WriteLine(GetJson(new {Status = "OK"}));
-
-                            int messagePort = (int) data["MessagePort"];
-
-                            // start control connection
-                            try {
-                                messageClient.Connect((client.Client.RemoteEndPoint as IPEndPoint).Address,
-                                    messagePort);
-                            } catch (SocketException ex) {
-                                sWriter.WriteLine(GetJson(new {
-                                    Status = "ERROR", ErrorCode = "MCNOP", Message = "Could not open message connection"
-                                }));
-                            }
+                        connectedClient =
+                            new Client(nextId, data["User"].ToObject<User>()) {
+                                TestState = new UserTestState() {State = UserTestState.UserState.Connected},
+                                ClientAppVersion = Version.Parse(data["AppVersion"].ToString())
+                            };
 
 
-                            sWriter.WriteLine(GetJson(new {Status = "OK"}));
+                        var reconnectCheck = clients.FirstOrDefault(c =>
+                            c.Name == connectedClient.Name && c.Surname == connectedClient.Surname &&
+                            c.TestState.State != UserTestState.UserState.Crashed);
 
-                            connectedClient.ControlConnection = messageClient;
-                            connectedClient.DataConnection = client;
-
-                            Thread.CurrentThread.Name = $"{connectedClient.Surname}Thread";
-
-                            var reconnectedClient = clients.FirstOrDefault(c =>
-                                c.Name == connectedClient.Name && c.Surname == connectedClient.Surname);
-
-                            // call reconnect function to reconnect the client
-                            if (reconnectedClient != null && reconnectedClient.TestState.State ==
-                                                          UserTestState.UserState.Crashed
-                                                          && ReconnectClient(ref connectedClient, ref reconnectedClient,
-                                                              sReader, sWriter)) {
-                                sWriter.WriteLine(GetJson(new {Status = "OK"}));
-                                continue;
-                            }
-
-                            // client cant or doesnt want to reconnect, add as new
-                            clients.Add(connectedClient);
-                            sWriter.WriteLine(GetJson(new {Status = "OK"}));
+                        // check connection name
+                        if (reconnectCheck != null) {
+                            sWriter.WriteLine(GetJson(new {Status = "Error", ErrorCode = "RCNNV", Message = $"Cannot reconnect to a non-crashed client. Disconnect from {reconnectCheck.Surname} first"}));
+                            break;
                         }
 
-                        // cannot use following functions if not yet connected
-                        if (connectedClient == null) {
-                            sWriter.WriteLine(JsonConvert.SerializeObject(new
-                                {Status = "ERROR", Code = "SYNFIRST", Message = "Client must call Connect first"}));
-                            sWriter.Flush();
+                        // check version match
+                        if (connectedClient.ClientAppVersion.Major !=
+                            Constants.APPLICATION_VERSION.Major ||
+                            connectedClient.ClientAppVersion.Minor !=
+                            Constants.APPLICATION_VERSION.Minor) {
+                            sWriter.WriteLine(GetJson(new {
+                                Status = "Error", ErrorCode = "VRSMM",
+                                ServerVersion = Constants.APPLICATION_VERSION.ToString()
+                            }));
                             continue;
                         }
 
+                        sWriter.WriteLine(GetJson(new {Status = "OK"}));
+
+                        int messagePort = (int) data["MessagePort"];
+
+                        // start control connection
+                        try {
+                            messageClient.Connect((client.Client.RemoteEndPoint as IPEndPoint).Address,
+                                messagePort);
+                        } catch (SocketException ex) {
+                            sWriter.WriteLine(GetJson(new {
+                                Status = "ERROR", ErrorCode = "MCNOP", Message = "Could not open message connection"
+                            }));
+                        }
+
+
+                        sWriter.WriteLine(GetJson(new {Status = "OK"}));
+
+                        connectedClient.ControlConnection = messageClient;
+                        connectedClient.DataConnection = client;
+
+                        Thread.CurrentThread.Name = $"{connectedClient.Surname}Thread";
+
+                        var reconnectedClient = clients.FirstOrDefault(c =>
+                            c.Name == connectedClient.Name && c.Surname == connectedClient.Surname);
+
+                        // call reconnect function to reconnect the client
+                        if (reconnectedClient != null && reconnectedClient.TestState.State ==
+                                                      UserTestState.UserState.Crashed
+                                                      && ReconnectClient(ref connectedClient, ref reconnectedClient,
+                                                          sReader, sWriter)) {
+                            sWriter.WriteLine(GetJson(new {Status = "OK"}));
+                            continue;
+                        }
+
+                        // client cant or doesnt want to reconnect, add as new
+                        clients.Add(connectedClient);
+                        sWriter.WriteLine(GetJson(new {Status = "OK"}));
+                    }
+
+                    // cannot use following functions if not yet connected
+                    if (connectedClient == null) {
+                        sWriter.WriteLine(JsonConvert.SerializeObject(new
+                            {Status = "ERROR", Code = "SYNFIRST", Message = "Client must call Connect first"}));
+                        sWriter.Flush();
+                        continue;
+                    }
+
+                    lock (connectedClient) { // make sure client is modified my others (PollTimer)
+                        connectedClient.LastUpdate = ApplicationTime;
+
                         if (data["Action"].ToString() == "Disconnect") {
-                            connectedClient.ControlConnection.Close(); // close control connection
 
                             if (connectedClient.TestState.State != UserTestState.UserState.Finished) {
                                 connectedClient.TestState.State = UserTestState.UserState.Crashed; // set user state
@@ -214,6 +231,16 @@ namespace Testing_Reloaded_Server.Networking {
 
             if (connectedClient.TestState.State != UserTestState.UserState.Finished)
                 connectedClient.TestState.State = UserTestState.UserState.Crashed;
+
+            if (connectedClient.DataConnection != null && connectedClient.DataConnection.Connected) {
+                connectedClient.DataConnection.GetStream().Close();
+                connectedClient.DataConnection.Close();
+            }
+
+            if (connectedClient.DataConnection != null && connectedClient.ControlConnection.Connected) {
+                connectedClient.ControlConnection.GetStream().Close();
+                connectedClient.ControlConnection.Close();
+            }
         }
 
         private bool ReconnectClient(ref Client connectedClient,

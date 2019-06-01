@@ -60,6 +60,11 @@ namespace Testing_Reloaded_Server {
         }
 
         private string ClientsManagerOnReceivedMessageFromClient(Client c, JObject message) {
+            if (message == null) {
+                ClientStatusUpdated?.Invoke(c);
+                return null;
+            }
+
             if (message["Action"].ToString() == "GetTestInfo") {
                 return JsonConvert.SerializeObject(new {Status = "OK", Test = currentTest as Test});
             }

@@ -5,16 +5,13 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Testing_Reloaded_Client.UI;
 
-namespace Testing_Reloaded_Client
-{
-    static class Program
-    {
+namespace Testing_Reloaded_Client {
+    static class Program {
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
-        {
+        static void Main() {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new JoinTestForm());

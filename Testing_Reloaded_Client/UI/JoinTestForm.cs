@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharedLibrary;
 using SharedLibrary.Models;
+using SharedLibrary.Statics;
 using Testing_Reloaded_Client.Networking;
 
 namespace Testing_Reloaded_Client.UI {
@@ -18,6 +19,11 @@ namespace Testing_Reloaded_Client.UI {
 
         protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
+
+            if (Constants.DEBUG) {
+                txtName.Text = "Edoardo";
+                txtSurname.Text = "F";
+            }
 
             Task.Run(new Action(async () => {
                 var latestRelease = await updater.GetLatestRelease();

@@ -5,6 +5,7 @@ using Testing_Reloaded_Server.Models;
 using System.IO;
 using System.Threading.Tasks;
 using SharedLibrary;
+using SharedLibrary.Statics;
 using Testing_Reloaded_Server.Networking;
 
 namespace Testing_Reloaded_Server.UI {
@@ -18,6 +19,13 @@ namespace Testing_Reloaded_Server.UI {
 
         protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
+
+            if (Constants.DEBUG) {
+                txtTestName.Text = "MySuperTest";
+                txtDocsDir.Text = @"C:\Users\edoar\Desktop\Progetti\Test_RT\consegne";
+                chbTime.Text = "00:10:00";
+                txtConsegneDir.Text = @"C:\Users\edoar\Desktop\Progetti\Test_RT\consegne";
+            }
 
             Task.Run(new Action(async () => {
                 var latestRelease = await updater.GetLatestRelease();

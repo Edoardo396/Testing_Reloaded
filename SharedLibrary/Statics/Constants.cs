@@ -17,5 +17,6 @@ namespace SharedLibrary.Statics {
         public const int CRASH_DECLARED_TIME = 60;
 
         public static Version APPLICATION_VERSION = new Version(0, 5, 0);
+        public static bool DEBUG = true;
     }
 }

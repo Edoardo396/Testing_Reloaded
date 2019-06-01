@@ -68,6 +68,8 @@ namespace Testing_Reloaded_Client.UI {
             lblTestDir.Text = "Attendo inizio del test";
             lblCurrentOperation.Text = "Attendo Inizio";
 
+            testTimer.Start();
+
             try {
                 await testManager.WaitForTestStart();
                 ReloadUi();
@@ -93,7 +95,6 @@ namespace Testing_Reloaded_Client.UI {
 
             MessageBox.Show(message, "Test iniziato", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-            testTimer.Start();
 
             testManager.TestStarted();
 
@@ -110,6 +111,8 @@ namespace Testing_Reloaded_Client.UI {
                 ReloadUi();
             }
 
+            if (testManager.CurrentTest.State == Test.TestState.NotStarted) return;
+
             lblRemainingTime.Text = testManager.TestState.RemainingTime.ToString();
 
             TimeSpan remainingTime = testManager.TestState.RemainingTime;
@@ -124,7 +127,6 @@ namespace Testing_Reloaded_Client.UI {
                         $"Il tempo è scaduto",
                         "Tempo Scaduto", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     testManager.TestState.State = UserTestState.UserState.Finished;
-                    testTimer.Stop();
                 }
             }
 
@@ -144,10 +146,11 @@ namespace Testing_Reloaded_Client.UI {
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Error);
                     testManager.TestState.State = UserTestState.UserState.OnHold;
+                    return;
+                } finally {
+                    progressBar1.Visible = false;
+                    lblCurrentOperation.Visible = false;
                 }
-
-                progressBar1.Visible = false;
-                lblCurrentOperation.Visible = false;
 
                 MessageBox.Show("Consegnato, ora si può chiudere RTesting", "Done", MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
@@ -178,7 +181,9 @@ namespace Testing_Reloaded_Client.UI {
                 MessageBox.Show(
                     "La consegna è fallita, riprova oppure richiedi la consegna manuale. Il test è stato messo in pausa",
                     "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                testManager.TestState.State = UserTestState.UserState.OnHold;
                 System.Diagnostics.Debug.WriteLine(ex.Message);
+                testTimer.Start();
                 return;
             }
 
